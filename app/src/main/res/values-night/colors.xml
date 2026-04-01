@@ -3,7 +3,9 @@
     <!-- Override semantic colors for dark mode -->
     <color name="background">@color/background_dark</color>
     <color name="surface">@color/surface_dark</color>
+    <color name="surface_variant">@color/surface_variant_dark</color>
     <color name="text_primary">@color/text_primary_dark</color>
     <color name="text_secondary">@color/text_secondary_dark</color>
     <color name="divider">@color/divider_dark</color>
+    <color name="blue_surface">#1A5C8BE0</color>
 </resources>
