@@ -2,8 +2,9 @@ package com.example.paintrackerfree.ui.history
 
 import android.graphics.Canvas
 import android.os.Bundle
-import android.view.*
-import androidx.core.content.ContextCompat
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -37,7 +38,7 @@ class HistoryFragment : Fragment() {
 
         val adapter = HistoryAdapter { entry ->
             findNavController().navigate(R.id.action_history_to_logEntry,
-                android.os.Bundle().apply { putLong("entryId", entry.id) })
+                Bundle().apply { putLong("entryId", entry.id) })
         }
         binding.rvHistory.layoutManager = LinearLayoutManager(requireContext())
         binding.rvHistory.adapter = adapter

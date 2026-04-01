@@ -3,6 +3,7 @@ package com.example.paintrackerfree.ui.reports
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.paintrackerfree.PainTrackerApp
@@ -10,6 +11,7 @@ import com.example.paintrackerfree.R
 import com.example.paintrackerfree.databinding.FragmentReportsBinding
 import com.example.paintrackerfree.util.applyStatusBarPadding
 import com.example.paintrackerfree.util.CsvExporter
+import com.example.paintrackerfree.util.CsvImporter
 import com.example.paintrackerfree.util.PdfExporter
 import com.example.paintrackerfree.util.ViewModelFactory
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -22,6 +24,39 @@ class ReportsFragment : Fragment() {
 
     private val viewModel: ReportsViewModel by viewModels {
         ViewModelFactory((requireActivity().application as PainTrackerApp).repository)
+    }
+
+    private val importLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri ?: return@registerForActivityResult
+        runInBackground {
+            val result = CsvImporter.parseCsv(requireContext(), uri)
+            when (result) {
+                is CsvImporter.Result.Failure -> showToast(getString(R.string.import_failed, result.message))
+                is CsvImporter.Result.Success -> {
+                    if (result.entries.isEmpty()) {
+                        showToast(getString(R.string.import_nothing))
+                        return@runInBackground
+                    }
+                    val repo = (requireActivity().application as PainTrackerApp).repository
+                    var inserted = 0
+                    var duplicates = 0
+                    result.entries.forEach { entry ->
+                        if (repo.existsByTimestamp(entry.timestamp)) {
+                            duplicates++
+                        } else {
+                            repo.insert(entry)
+                            inserted++
+                        }
+                    }
+                    val totalSkipped = result.skipped + duplicates
+                    val msg = if (totalSkipped > 0)
+                        getString(R.string.import_success_skipped, inserted, totalSkipped)
+                    else
+                        getString(R.string.import_success, inserted)
+                    showToast(msg)
+                }
+            }
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -61,6 +96,10 @@ class ReportsFragment : Fragment() {
                 binding.tvTopLocation.text = getString(R.string.stat_top_location, stats.topLocation)
                 binding.tvTopTrigger.text = getString(R.string.stat_top_trigger, stats.topTrigger)
             }
+        }
+
+        binding.btnImport.setOnClickListener {
+            importLauncher.launch(arrayOf("text/csv", "text/comma-separated-values", "*/*"))
         }
 
         binding.btnExport.setOnClickListener {
@@ -108,22 +147,18 @@ class ReportsFragment : Fragment() {
         CoroutineScope(Dispatchers.IO).launch(block = block)
     }
 
-    private suspend fun showSaveResult(fileName: String?) {
+    private suspend fun showToast(message: String) {
         withContext(Dispatchers.Main) {
-            if (fileName != null) {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.export_saved_downloads, fileName),
-                    Toast.LENGTH_LONG
-                ).show()
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.export_save_failed),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
         }
+    }
+
+    private suspend fun showSaveResult(fileName: String?) {
+        val message = if (fileName != null)
+            getString(R.string.export_saved_downloads, fileName)
+        else
+            getString(R.string.export_save_failed)
+        showToast(message)
     }
 
     override fun onDestroyView() {

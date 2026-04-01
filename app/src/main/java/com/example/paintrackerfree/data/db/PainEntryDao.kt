@@ -19,6 +19,9 @@ interface PainEntryDao {
     @Query("SELECT * FROM pain_entries WHERE id = :id")
     suspend fun getEntryById(id: Long): PainEntry?
 
+    @Query("SELECT COUNT(*) FROM pain_entries WHERE timestamp = :timestamp")
+    suspend fun countByTimestamp(timestamp: Long): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entry: PainEntry): Long
 

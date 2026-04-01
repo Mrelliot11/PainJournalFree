@@ -45,7 +45,12 @@
     <string name="days_30">30 Days</string>
     <string name="days_90">90 Days</string>
     <string name="no_data_period">No entries in this period.</string>
-    <string name="export_csv">Export to CSV</string>
+    <string name="export_csv">Export CSV/PDF</string>
+    <string name="import_csv">Import CSV</string>
+    <string name="import_success">Imported %1$d entries</string>
+    <string name="import_success_skipped">Imported %1$d entries (%2$d skipped)</string>
+    <string name="import_failed">Import failed: %s</string>
+    <string name="import_nothing">No valid entries found in file</string>
     <string name="export_title">Share Pain Journal</string>
     <string name="export_choose_title">Export</string>
     <string name="export_save_downloads_csv">Save CSV to Downloads</string>
@@ -62,6 +67,13 @@
     <string name="_0">0</string>
     <string name="_10">10</string>
     <string name="_5">5</string>
+    <string name="painentrytab">PainEntryTab</string>
+
+    <string name="add_custom">Add custom</string>
+    <string name="add_custom_title">Add custom option</string>
+    <string name="custom_option_hint">Type your option…</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
 
     <!-- Chip arrays -->
     <string-array name="body_locations">

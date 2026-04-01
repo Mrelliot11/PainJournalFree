@@ -1,10 +1,14 @@
 package com.example.paintrackerfree.ui.reports
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import com.example.paintrackerfree.data.model.PainEntry
 import com.example.paintrackerfree.data.repository.PainRepository
 import com.example.paintrackerfree.util.DateUtils
-import kotlinx.coroutines.flow.map
 
 data class ReportStats(
     val avgPain: Float,

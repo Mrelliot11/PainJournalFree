@@ -4,6 +4,10 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
 import android.view.*
+import android.widget.EditText
+import android.widget.FrameLayout
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -12,10 +16,13 @@ import com.example.paintrackerfree.PainTrackerApp
 import com.example.paintrackerfree.R
 import com.example.paintrackerfree.data.model.PainEntry
 import com.example.paintrackerfree.databinding.FragmentLogEntryBinding
+import com.example.paintrackerfree.util.CustomOptionsStore
 import com.example.paintrackerfree.util.DateUtils
 import com.example.paintrackerfree.util.ViewModelFactory
 import com.example.paintrackerfree.util.applyStatusBarPadding
 import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.Calendar
 
 class LogEntryFragment : Fragment() {
@@ -99,27 +106,113 @@ class LogEntryFragment : Fragment() {
     }
 
     private fun setupChips() {
-        val locations = resources.getStringArray(R.array.body_locations)
-        val painTypes = resources.getStringArray(R.array.pain_types)
-        val triggers = resources.getStringArray(R.array.triggers)
+        val ctx = requireContext()
+        addChips(binding.chipGroupLocations, resources.getStringArray(R.array.body_locations))
+        addChips(binding.chipGroupLocations, CustomOptionsStore.getLocations(ctx).toTypedArray(), isCustom = true)
+        addAddCustomChip(binding.chipGroupLocations) { value ->
+            CustomOptionsStore.addLocation(ctx, value)
+            addChips(binding.chipGroupLocations, arrayOf(value), isCustom = true, beforeLast = true)
+            checkChipByTag(binding.chipGroupLocations, value)
+        }
 
-        addChips(binding.chipGroupLocations, locations)
-        addChips(binding.chipGroupPainTypes, painTypes)
-        addChips(binding.chipGroupTriggers, triggers)
+        addChips(binding.chipGroupPainTypes, resources.getStringArray(R.array.pain_types))
+        addChips(binding.chipGroupPainTypes, CustomOptionsStore.getPainTypes(ctx).toTypedArray(), isCustom = true)
+        addAddCustomChip(binding.chipGroupPainTypes) { value ->
+            CustomOptionsStore.addPainType(ctx, value)
+            addChips(binding.chipGroupPainTypes, arrayOf(value), isCustom = true, beforeLast = true)
+            checkChipByTag(binding.chipGroupPainTypes, value)
+        }
+
+        addChips(binding.chipGroupTriggers, resources.getStringArray(R.array.triggers))
+        addChips(binding.chipGroupTriggers, CustomOptionsStore.getTriggers(ctx).toTypedArray(), isCustom = true)
+        addAddCustomChip(binding.chipGroupTriggers) { value ->
+            CustomOptionsStore.addTrigger(ctx, value)
+            addChips(binding.chipGroupTriggers, arrayOf(value), isCustom = true, beforeLast = true)
+            checkChipByTag(binding.chipGroupTriggers, value)
+        }
     }
 
-    private fun addChips(group: com.google.android.material.chip.ChipGroup, labels: Array<String>) {
+    private fun addChips(
+        group: ChipGroup,
+        labels: Array<String>,
+        isCustom: Boolean = false,
+        beforeLast: Boolean = false
+    ) {
         labels.forEach { label ->
             val chip = Chip(requireContext()).apply {
                 text = label
                 isCheckable = true
                 tag = label
+                if (isCustom) {
+                    isCloseIconVisible = true
+                    setOnCloseIconClickListener {
+                        group.removeView(this)
+                        removeCustomOption(group, label)
+                    }
+                }
             }
-            group.addView(chip)
+            if (beforeLast && group.childCount > 0) {
+                group.addView(chip, group.childCount - 1)
+            } else {
+                group.addView(chip)
+            }
         }
     }
 
-    private fun setCheckedChips(group: com.google.android.material.chip.ChipGroup, csv: String) {
+    private fun addAddCustomChip(group: ChipGroup, onAdded: (String) -> Unit) {
+        val chip = Chip(requireContext()).apply {
+            text = getString(R.string.add_custom)
+            isCheckable = false
+            chipIcon = requireContext().getDrawable(R.drawable.ic_add)
+            isChipIconVisible = true
+            setOnClickListener { showAddCustomDialog(group, onAdded) }
+        }
+        group.addView(chip)
+    }
+
+    private fun showAddCustomDialog(group: ChipGroup, onAdded: (String) -> Unit) {
+        val ctx = requireContext()
+        val dp16 = (16 * resources.displayMetrics.density).toInt()
+        val dp8 = (8 * resources.displayMetrics.density).toInt()
+
+        val input = TextInputEditText(ctx).apply { setSingleLine() }
+        val til = TextInputLayout(ctx, null, com.google.android.material.R.attr.textInputOutlinedStyle).apply {
+            hint = getString(R.string.custom_option_hint)
+            addView(input)
+        }
+        val container = FrameLayout(ctx).apply {
+            setPadding(dp16 + dp8, dp8, dp16 + dp8, 0)
+            addView(til)
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.add_custom_title)
+            .setView(container)
+            .setPositiveButton(R.string.add) { _, _ ->
+                val value = input.text.toString().trim()
+                if (value.isNotEmpty()) onAdded(value)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun removeCustomOption(group: ChipGroup, value: String) {
+        val ctx = requireContext()
+        when (group.id) {
+            R.id.chip_group_locations -> CustomOptionsStore.removeLocation(ctx, value)
+            R.id.chip_group_pain_types -> CustomOptionsStore.removePainType(ctx, value)
+            R.id.chip_group_triggers -> CustomOptionsStore.removeTrigger(ctx, value)
+        }
+    }
+
+    private fun checkChipByTag(group: ChipGroup, tag: String) {
+        for (i in 0 until group.childCount) {
+            val chip = group.getChildAt(i) as? Chip ?: continue
+            if (chip.tag == tag) { chip.isChecked = true; break }
+        }
+    }
+
+    private fun setCheckedChips(group: ChipGroup, csv: String) {
         val selected = csv.split(",").map { it.trim() }.toSet()
         for (i in 0 until group.childCount) {
             val chip = group.getChildAt(i) as? Chip ?: continue
@@ -127,7 +220,7 @@ class LogEntryFragment : Fragment() {
         }
     }
 
-    private fun getCheckedChips(group: com.google.android.material.chip.ChipGroup): String {
+    private fun getCheckedChips(group: ChipGroup): String {
         val checked = mutableListOf<String>()
         for (i in 0 until group.childCount) {
             val chip = group.getChildAt(i) as? Chip ?: continue

@@ -34,7 +34,7 @@ class HomeFragment : Fragment() {
 
         val adapter = HistoryAdapter { entry ->
             findNavController().navigate(R.id.action_home_to_logEntry,
-                android.os.Bundle().apply { putLong("entryId", entry.id) })
+                Bundle().apply { putLong("entryId", entry.id) })
         }
         binding.rvRecentEntries.layoutManager = LinearLayoutManager(requireContext())
         binding.rvRecentEntries.adapter = adapter

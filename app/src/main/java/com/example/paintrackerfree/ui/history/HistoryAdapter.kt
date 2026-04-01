@@ -51,7 +51,7 @@ class HistoryAdapter(private val onEntryClick: (PainEntry) -> Unit) :
     fun getEntryAt(position: Int): PainEntry? =
         (getItem(position) as? HistoryItem.Entry)?.entry
 
-    inner class HeaderVH(private val b: ItemDateHeaderBinding) : RecyclerView.ViewHolder(b.root) {
+    class HeaderVH(private val b: ItemDateHeaderBinding) : RecyclerView.ViewHolder(b.root) {
         fun bind(item: HistoryItem.Header) { b.tvDateHeader.text = item.dateLabel }
     }
 

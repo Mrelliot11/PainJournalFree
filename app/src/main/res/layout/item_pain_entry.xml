@@ -69,7 +69,7 @@
             android:layout_height="20dp"
             android:layout_marginStart="8dp"
             android:src="@drawable/ic_chevron_right"
-            android:contentDescription=""
+            android:contentDescription="@string/painentrytab"
             app:tint="@color/text_secondary" />
 
     </LinearLayout>

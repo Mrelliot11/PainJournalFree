@@ -15,6 +15,7 @@ import androidx.core.content.FileProvider
 import com.example.paintrackerfree.data.model.PainEntry
 import java.io.File
 import java.io.IOException
+import androidx.core.graphics.toColorInt
 
 object PdfExporter {
 
@@ -60,7 +61,7 @@ object PdfExporter {
                 buildPdf(entries).close()
             }
             fileName
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             null
         }
     }
@@ -75,44 +76,40 @@ object PdfExporter {
     }
 
     private fun buildPdf(entries: List<PainEntry>): PdfDocument {
+        val allSorted = entries.sortedBy { it.timestamp }
+        val now = System.currentTimeMillis()
         val doc = PdfDocument()
 
-        // --- Paints ---
+        // --- Shared paints ---
         val titlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            textSize = 22f
-            color = Color.parseColor("#1A1A2E")
-            isFakeBoldText = true
+            textSize = 22f; color = "#1A1A2E".toColorInt(); isFakeBoldText = true
         }
         val subtitlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            textSize = 11f
-            color = Color.parseColor("#757575")
+            textSize = 11f; color = "#757575".toColorInt()
         }
         val sectionPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            textSize = 9f
-            color = Color.parseColor("#5C8BE0")
-            isFakeBoldText = true
-            letterSpacing = 0.08f
+            textSize = 9f; color = "#5C8BE0".toColorInt()
+            isFakeBoldText = true; letterSpacing = 0.08f
         }
         val bodyPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            textSize = 10f
-            color = Color.parseColor("#1A1A2E")
+            textSize = 10f; color = "#1A1A2E".toColorInt()
         }
         val mutedPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            textSize = 9f
-            color = Color.parseColor("#757575")
+            textSize = 9f; color = "#757575".toColorInt()
         }
-        val badgePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.FILL
-        }
+        val badgePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
         val badgeTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            textSize = 13f
-            color = Color.WHITE
-            isFakeBoldText = true
-            textAlign = Paint.Align.CENTER
+            textSize = 13f; color = Color.WHITE
+            isFakeBoldText = true; textAlign = Paint.Align.CENTER
         }
         val dividerPaint = Paint().apply {
-            color = Color.parseColor("#E0E0E0")
-            strokeWidth = 0.5f
+            color = "#E0E0E0".toColorInt(); strokeWidth = 0.5f
+        }
+        val statMutedPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            textSize = 9f; color = "#757575".toColorInt()
+        }
+        val statBodyPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            textSize = 9f; color = "#1A1A2E".toColorInt()
         }
 
         var pageNum = 1
@@ -122,11 +119,8 @@ object PdfExporter {
         var y = MARGIN
 
         fun finishPage() {
-            // page footer
             val footerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                textSize = 9f
-                color = Color.parseColor("#9E9E9E")
-                textAlign = Paint.Align.CENTER
+                textSize = 9f; color = "#9E9E9E".toColorInt(); textAlign = Paint.Align.CENTER
             }
             canvas.drawText("Pain Tracker  •  Page $pageNum", PAGE_WIDTH / 2f, PAGE_HEIGHT - 24f, footerPaint)
             doc.finishPage(page)
@@ -145,19 +139,179 @@ object PdfExporter {
             if (y + needed > PAGE_HEIGHT - MARGIN - 20f) newPage()
         }
 
+        // Draws a trend chart + stats block for the given slice of entries.
+        fun drawTrendSection(label: String, slice: List<PainEntry>) {
+            ensureSpace(220f)
+
+            // Section heading
+            canvas.drawText(label, MARGIN, y + sectionPaint.textSize, sectionPaint)
+            y += sectionPaint.textSize + 8f
+
+            if (slice.size < 2) {
+                canvas.drawText(
+                    if (slice.isEmpty()) "No entries in this period." else "Only 1 entry — not enough data to chart.",
+                    MARGIN, y + mutedPaint.textSize, mutedPaint
+                )
+                y += mutedPaint.textSize + 12f
+                canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, dividerPaint)
+                y += 16f
+                return
+            }
+
+            // Chart geometry
+            val chartH = 120f
+            val padL = 36f; val padR = 8f; val padT = 6f; val padB = 22f
+            val chartLeft = MARGIN + padL
+            val chartRight = PAGE_WIDTH.toFloat() - MARGIN - padR
+            val chartTop = y + padT
+            val chartBottom = y + padT + chartH - padB
+            val chartW = chartRight - chartLeft
+
+            val gridPaint = Paint().apply { color = "#E8E8E8".toColorInt(); strokeWidth = 0.5f }
+            val axisLabelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                textSize = 7f; color = "#9E9E9E".toColorInt(); textAlign = Paint.Align.RIGHT
+            }
+            for (i in 0..10 step 2) {
+                val gy = chartBottom - (i / 10f) * (chartBottom - chartTop)
+                canvas.drawLine(chartLeft, gy, chartRight, gy, gridPaint)
+                canvas.drawText(i.toString(), chartLeft - 4f, gy + axisLabelPaint.textSize / 2.5f, axisLabelPaint)
+            }
+
+            // Aggregate: average pain per calendar day to eliminate intra-day vertical spikes
+            val dayFormat = java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.US)
+            val dailyPoints: List<Pair<Long, Float>> = slice
+                .groupBy { dayFormat.format(java.util.Date(it.timestamp)) }
+                .entries
+                .sortedBy { it.key }
+                .map { (_, dayEntries) ->
+                    val midTimestamp = dayEntries.map { it.timestamp }.average().toLong()
+                    val avgLevel = dayEntries.map { it.painLevel }.average().toFloat()
+                    midTimestamp to avgLevel
+                }
+
+            val minT = dailyPoints.first().first.toFloat()
+            val maxT = dailyPoints.last().first.toFloat()
+            val rangeT = if (maxT > minT) maxT - minT else 1f
+            fun xOf(ts: Long) = chartLeft + (ts - minT) / rangeT * chartW
+            fun yOf(lvl: Float) = chartBottom - (lvl / 10f) * (chartBottom - chartTop)
+
+            // Filled area — explicit baseline edges so the fill never leaks
+            val fillPath = android.graphics.Path()
+            fillPath.moveTo(xOf(dailyPoints.first().first), chartBottom)
+            dailyPoints.forEach { (ts, lvl) -> fillPath.lineTo(xOf(ts), yOf(lvl)) }
+            fillPath.lineTo(xOf(dailyPoints.last().first), chartBottom)
+            fillPath.lineTo(xOf(dailyPoints.first().first), chartBottom)
+            fillPath.close()
+            canvas.drawPath(fillPath, Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                style = Paint.Style.FILL
+                color = "#285C8BE0".toColorInt()
+            })
+
+            // Line
+            val linePath = android.graphics.Path()
+            dailyPoints.forEachIndexed { i, (ts, lvl) ->
+                if (i == 0) linePath.moveTo(xOf(ts), yOf(lvl))
+                else linePath.lineTo(xOf(ts), yOf(lvl))
+            }
+            canvas.drawPath(linePath, Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                style = Paint.Style.STROKE; color = "#5C8BE0".toColorInt()
+                strokeWidth = 2f; strokeJoin = Paint.Join.ROUND; strokeCap = Paint.Cap.ROUND
+            })
+
+            // Dots — coloured by the averaged pain level for the day
+            val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
+            dailyPoints.forEach { (ts, lvl) ->
+                dotPaint.color = when {
+                    lvl <= 3f -> "#4CAF50".toColorInt()
+                    lvl <= 6f -> "#FF9800".toColorInt()
+                    else -> "#F44336".toColorInt()
+                }
+                canvas.drawCircle(xOf(ts), yOf(lvl), 3f, dotPaint)
+            }
+
+            // X-axis labels (one per day point, thinned to ~5)
+            val xLabelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                textSize = 7f; color = "#9E9E9E".toColorInt(); textAlign = Paint.Align.CENTER
+            }
+            val step = maxOf(1, dailyPoints.size / 5)
+            dailyPoints.filterIndexed { i, _ -> i % step == 0 || i == dailyPoints.size - 1 }
+                .forEach { (ts, _) ->
+                    canvas.drawText(DateUtils.formatChartDate(ts), xOf(ts), chartBottom + 14f, xLabelPaint)
+                }
+
+            y += padT + chartH + 6f
+
+            // Color legend
+            val legendPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 8f; color = "#757575".toColorInt() }
+            val dotLegend = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
+            var lx = MARGIN
+            listOf(Pair("Low (0–3)", "#4CAF50"), Pair("Moderate (4–6)", "#FF9800"), Pair("High (7–10)", "#F44336"))
+                .forEach { (lbl, hex) ->
+                    dotLegend.color = hex.toColorInt()
+                    canvas.drawCircle(lx + 5f, y + 4f, 4f, dotLegend)
+                    canvas.drawText(lbl, lx + 13f, y + 8f, legendPaint)
+                    lx += legendPaint.measureText(lbl) + 28f
+                }
+            y += 18f
+
+            // Stats row
+            val avg = slice.map { it.painLevel }.average()
+            val maxP = slice.maxOf { it.painLevel }
+            val minP = slice.minOf { it.painLevel }
+            val topLoc = slice.flatMap { it.locations.split(",").map(String::trim).filter(String::isNotBlank) }
+                .groupingBy { it }.eachCount().maxByOrNull { it.value }?.key ?: "—"
+            val topTrig = slice.flatMap { it.triggers.split(",").map(String::trim).filter(String::isNotBlank) }
+                .groupingBy { it }.eachCount().maxByOrNull { it.value }?.key ?: "—"
+            val avgMood = slice.map { it.mood }.average()
+            val avgSleep = slice.map { it.sleepQuality }.average()
+
+            val col2X = MARGIN + CONTENT_WIDTH / 2f
+            val statRows = listOf(
+                Pair("Entries", slice.size.toString()) to Pair("Avg Pain", "%.1f".format(avg)),
+                Pair("Range", "$minP – $maxP") to Pair("Top Location", topLoc),
+                Pair("Top Trigger", topTrig) to Pair("Avg Mood", "%.1f / 5".format(avgMood)),
+                Pair("Avg Sleep", "%.1f / 5".format(avgSleep)) to null
+            )
+            statRows.forEach { (left, right) ->
+                canvas.drawText(left.first, MARGIN, y + statBodyPaint.textSize, statMutedPaint)
+                canvas.drawText(left.second, MARGIN + 72f, y + statBodyPaint.textSize, statBodyPaint)
+                if (right != null) {
+                    canvas.drawText(right.first, col2X, y + statBodyPaint.textSize, statMutedPaint)
+                    canvas.drawText(right.second, col2X + 72f, y + statBodyPaint.textSize, statBodyPaint)
+                }
+                y += 13f
+            }
+
+            y += 4f
+            canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, dividerPaint)
+            y += 16f
+        }
+
         // --- Header ---
         canvas.drawText("Pain Journal", MARGIN, y + titlePaint.textSize, titlePaint)
         y += titlePaint.textSize + 6f
-
-        val generatedText = "Generated ${DateUtils.formatDateTime(System.currentTimeMillis())}  •  ${entries.size} entries"
-        canvas.drawText(generatedText, MARGIN, y + subtitlePaint.textSize, subtitlePaint)
+        canvas.drawText(
+            "Generated ${DateUtils.formatDateTime(now)}  •  ${allSorted.size} total entries",
+            MARGIN, y + subtitlePaint.textSize, subtitlePaint
+        )
         y += subtitlePaint.textSize + 14f
-
         canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, dividerPaint)
         y += 18f
 
+        // --- Three trend sections ---
+        listOf(7, 30, 90).forEach { days ->
+            val cutoff = DateUtils.daysAgoMs(days)
+            val slice = allSorted.filter { it.timestamp >= cutoff }
+            drawTrendSection("LAST $days DAYS", slice)
+        }
+
+        // --- Entries list ---
+        newPage()
+        canvas.drawText("ALL ENTRIES", MARGIN, y + sectionPaint.textSize, sectionPaint)
+        y += sectionPaint.textSize + 10f
+
         // --- Entries ---
-        for (entry in entries) {
+        for (entry in allSorted) {
             val badgeSize = 32f
             val rowHeight = badgeSize + 16f
             val notesText = entry.notes.trim()
@@ -176,9 +330,9 @@ object PdfExporter {
 
             // Badge
             badgePaint.color = when {
-                entry.painLevel <= 3 -> Color.parseColor("#4CAF50")
-                entry.painLevel <= 6 -> Color.parseColor("#FF9800")
-                else -> Color.parseColor("#F44336")
+                entry.painLevel <= 3 -> "#4CAF50".toColorInt()
+                entry.painLevel <= 6 -> "#FF9800".toColorInt()
+                else -> "#F44336".toColorInt()
             }
             canvas.drawRoundRect(
                 RectF(MARGIN, rowTop, MARGIN + badgeSize, rowTop + badgeSize),

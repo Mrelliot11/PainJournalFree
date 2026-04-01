@@ -52,7 +52,7 @@ object CsvExporter {
                 File(dir, fileName).writeText(csvContent)
             }
             fileName
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             null
         }
     }

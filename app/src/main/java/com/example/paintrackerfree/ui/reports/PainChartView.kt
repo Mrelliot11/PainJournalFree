@@ -6,6 +6,10 @@ import android.util.AttributeSet
 import android.view.View
 import com.example.paintrackerfree.data.model.PainEntry
 import com.example.paintrackerfree.util.DateUtils
+import androidx.core.graphics.toColorInt
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class PainChartView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyle: Int = 0
@@ -19,28 +23,30 @@ class PainChartView @JvmOverloads constructor(
     private val padT = 24f
     private val padB = 56f
 
+    private val dayFormat = SimpleDateFormat("yyyyMMdd", Locale.US)
+
     private val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#E0E0E0"); strokeWidth = 1f
+        color = "#E0E0E0".toColorInt(); strokeWidth = 1f
     }
     private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#5C8BE0"); strokeWidth = 4f; style = Paint.Style.STROKE
+        color = "#5C8BE0".toColorInt(); strokeWidth = 4f; style = Paint.Style.STROKE
         strokeJoin = Paint.Join.ROUND; strokeCap = Paint.Cap.ROUND
     }
     private val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
     private val labelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#757575")
+        color = "#757575".toColorInt()
         textSize = resources.displayMetrics.scaledDensity * 13f
     }
     private val emptyPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#BDBDBD")
+        color = "#BDBDBD".toColorInt()
         textSize = resources.displayMetrics.scaledDensity * 16f
         textAlign = Paint.Align.CENTER
     }
 
     private fun dotColor(level: Int): Int = when {
-        level <= 3 -> Color.parseColor("#4CAF50")
-        level <= 6 -> Color.parseColor("#FF9800")
-        else -> Color.parseColor("#F44336")
+        level <= 3 -> "#4CAF50".toColorInt()
+        level <= 6 -> "#FF9800".toColorInt()
+        else -> "#F44336".toColorInt()
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -60,36 +66,44 @@ class PainChartView @JvmOverloads constructor(
             return
         }
 
-        val minT = entries.first().timestamp.toFloat()
-        val maxT = entries.last().timestamp.toFloat()
+        // Average pain per calendar day so multiple same-day entries don't cause vertical spikes
+        val dailyPoints: List<Pair<Long, Float>> = entries
+            .groupBy { dayFormat.format(Date(it.timestamp)) }
+            .entries
+            .sortedBy { it.key }
+            .map { (_, dayEntries) ->
+                val midTs = dayEntries.map { it.timestamp }.average().toLong()
+                val avgLevel = dayEntries.map { it.painLevel }.average().toFloat()
+                midTs to avgLevel
+            }
+
+        val minT = dailyPoints.first().first.toFloat()
+        val maxT = dailyPoints.last().first.toFloat()
         val rangeT = if (maxT > minT) maxT - minT else 1f
 
         fun xOf(ts: Long) = padL + (ts - minT) / rangeT * chartW
-        fun yOf(level: Int) = padT + chartH * (1f - level / 10f)
+        fun yOf(level: Float) = padT + chartH * (1f - level / 10f)
 
-        // Line path
+        // Line path — reset each draw to avoid accumulation across invalidations
         val path = Path()
-        entries.forEachIndexed { i, e ->
-            val x = xOf(e.timestamp); val y = yOf(e.painLevel)
-            if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
+        dailyPoints.forEachIndexed { i, (ts, lvl) ->
+            if (i == 0) path.moveTo(xOf(ts), yOf(lvl)) else path.lineTo(xOf(ts), yOf(lvl))
         }
         canvas.drawPath(path, linePaint)
 
         // Dots
-        entries.forEach { e ->
-            dotPaint.color = dotColor(e.painLevel)
-            canvas.drawCircle(xOf(e.timestamp), yOf(e.painLevel), 8f, dotPaint)
+        dailyPoints.forEach { (ts, lvl) ->
+            dotPaint.color = dotColor(lvl.toInt())
+            canvas.drawCircle(xOf(ts), yOf(lvl), 8f, dotPaint)
         }
 
-        // X axis date labels (up to 5)
-        val step = maxOf(1, entries.size / 5)
-        val labeled = entries.filterIndexed { i, _ -> i % step == 0 || i == entries.size - 1 }
-            .distinctBy { DateUtils.formatChartDate(it.timestamp) }
-        labeled.forEach { e ->
-            val label = DateUtils.formatChartDate(e.timestamp)
-            val x = xOf(e.timestamp)
-            canvas.drawText(label, x - labelPaint.measureText(label) / 2f, h - 10f, labelPaint)
-        }
+        // X-axis date labels (up to 5)
+        val step = maxOf(1, dailyPoints.size / 5)
+        dailyPoints.filterIndexed { i, _ -> i % step == 0 || i == dailyPoints.size - 1 }
+            .forEach { (ts, _) ->
+                val label = DateUtils.formatChartDate(ts)
+                canvas.drawText(label, xOf(ts) - labelPaint.measureText(label) / 2f, h - 10f, labelPaint)
+            }
     }
 
     override fun onMeasure(widthSpec: Int, heightSpec: Int) {

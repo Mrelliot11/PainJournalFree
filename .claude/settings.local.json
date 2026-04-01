@@ -1,8 +1,9 @@
 {
-  "prefersReducedMotion": false,
   "permissions": {
     "allow": [
-      "Bash(./gradlew assembleDebug)"
+      "Bash(./gradlew assembleDebug)",
+      "Bash(./gradlew compileDebugKotlin)"
     ]
-  }
+  },
+  "prefersReducedMotion": false
 }
