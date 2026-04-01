@@ -5,11 +5,11 @@ import java.util.*
 
 object DateUtils {
 
-    private val dateTimeFormat = SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault())
-    private val timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
-    private val dateHeaderFormat = SimpleDateFormat("EEEE, MMMM d", Locale.getDefault())
-    private val chartDateFormat = SimpleDateFormat("M/d", Locale.getDefault())
-    private val csvDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    private var dateTimeFormat = SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault())
+    private var timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
+    private var dateHeaderFormat = SimpleDateFormat("EEEE, MMMM d", Locale.getDefault())
+    private var chartDateFormat = SimpleDateFormat("M/d", Locale.getDefault())
+    private var csvDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
     fun formatDateTime(epochMs: Long): String = dateTimeFormat.format(Date(epochMs))
     fun formatTime(epochMs: Long): String = timeFormat.format(Date(epochMs))

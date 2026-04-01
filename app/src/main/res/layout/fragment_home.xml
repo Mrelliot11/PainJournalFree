@@ -7,7 +7,6 @@
     android:background="?android:colorBackground">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/blue_primary"
@@ -63,7 +62,6 @@
                         android:textColor="#CCFFFFFF" />
 
                     <TextView
-                        android:id="@+id/tv_today_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
@@ -73,7 +71,6 @@
                         android:textColor="@color/white" />
 
                     <TextView
-                        android:id="@+id/tv_today_avg"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
@@ -95,7 +92,6 @@
                 android:textColor="@color/text_primary" />
 
             <TextView
-                android:id="@+id/tv_no_entries"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -107,7 +103,6 @@
                 android:visibility="gone" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_recent_entries"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false" />
@@ -116,7 +111,6 @@
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fab_log_pain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"

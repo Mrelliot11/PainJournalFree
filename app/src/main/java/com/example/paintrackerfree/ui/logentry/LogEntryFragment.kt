@@ -165,14 +165,14 @@ class LogEntryFragment : Fragment() {
         val chip = Chip(requireContext()).apply {
             text = getString(R.string.add_custom)
             isCheckable = false
-            chipIcon = requireContext().getDrawable(R.drawable.ic_add)
+            chipIcon = androidx.appcompat.content.res.AppCompatResources.getDrawable(requireContext(), R.drawable.ic_add)
             isChipIconVisible = true
-            setOnClickListener { showAddCustomDialog(group, onAdded) }
+            setOnClickListener { showAddCustomDialog(onAdded) }
         }
         group.addView(chip)
     }
 
-    private fun showAddCustomDialog(group: ChipGroup, onAdded: (String) -> Unit) {
+    private fun showAddCustomDialog(onAdded: (String) -> Unit) {
         val ctx = requireContext()
         val dp16 = (16 * resources.displayMetrics.density).toInt()
         val dp8 = (8 * resources.displayMetrics.density).toInt()

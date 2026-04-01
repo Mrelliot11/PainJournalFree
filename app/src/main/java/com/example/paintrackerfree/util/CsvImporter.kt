@@ -8,8 +8,6 @@ import java.util.Locale
 
 object CsvImporter {
 
-    private val csvDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-
     sealed class Result {
         data class Success(val entries: List<PainEntry>, val skipped: Int) : Result()
         data class Failure(val message: String) : Result()
@@ -37,6 +35,7 @@ object CsvImporter {
             if (cols.size < 9) { skipped++; continue }
 
             val timestamp = try {
+                val csvDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
                 csvDateFormat.parse(cols[0].trim())?.time
             } catch (_: Exception) { null }
             if (timestamp == null) { skipped++; continue }
@@ -69,14 +68,13 @@ object CsvImporter {
         var inQuotes = false
         var i = 0
         while (i < line.length) {
-            val c = line[i]
-            when {
-                c == '"' && !inQuotes -> inQuotes = true
-                c == '"' && inQuotes && i + 1 < line.length && line[i + 1] == '"' -> {
+            when (val c = line[i]) {
+                '"' if !inQuotes -> inQuotes = true
+                '"' if i + 1 < line.length && line[i + 1] == '"' -> {
                     sb.append('"'); i++ // escaped quote inside quoted field
                 }
-                c == '"' && inQuotes -> inQuotes = false
-                c == ',' && !inQuotes -> { cols.add(sb.toString()); sb.clear() }
+                '"' if true -> inQuotes = false
+                ',' if !inQuotes -> { cols.add(sb.toString()); sb.clear() }
                 else -> sb.append(c)
             }
             i++

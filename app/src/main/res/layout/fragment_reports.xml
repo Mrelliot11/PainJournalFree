@@ -7,7 +7,6 @@
     android:background="?android:colorBackground">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/blue_primary"
@@ -39,7 +38,6 @@
 
             <!-- Date range toggle -->
             <com.google.android.material.button.MaterialButtonToggleGroup
-                android:id="@+id/toggle_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -65,7 +63,6 @@
                     style="?attr/materialButtonOutlinedStyle" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn90days"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
@@ -111,7 +108,6 @@
 
             <!-- No data message -->
             <TextView
-                android:id="@+id/tv_no_data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -123,7 +119,6 @@
 
             <!-- Stats card -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_stats"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
@@ -150,7 +145,6 @@
                         android:textColor="@color/text_primary" />
 
                     <TextView
-                        android:id="@+id/tv_entry_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
@@ -158,7 +152,6 @@
                         android:textColor="@color/text_primary" />
 
                     <TextView
-                        android:id="@+id/tv_avg_pain"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
@@ -172,7 +165,6 @@
                         android:background="@color/divider" />
 
                     <TextView
-                        android:id="@+id/tv_pain_range"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="6dp"
@@ -180,7 +172,6 @@
                         android:textColor="@color/text_primary" />
 
                     <TextView
-                        android:id="@+id/tv_top_location"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="6dp"
@@ -188,7 +179,6 @@
                         android:textColor="@color/text_primary" />
 
                     <TextView
-                        android:id="@+id/tv_top_trigger"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="14sp"
@@ -207,7 +197,6 @@
                 android:gravity="center">
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_export"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_weight="1"
@@ -217,7 +206,6 @@
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_import"
                     android:layout_width="0dp"
                     android:layout_height="56dp"
                     android:layout_weight="1"

@@ -29,8 +29,7 @@ class ReportsFragment : Fragment() {
     private val importLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri ?: return@registerForActivityResult
         runInBackground {
-            val result = CsvImporter.parseCsv(requireContext(), uri)
-            when (result) {
+            when (val result = CsvImporter.parseCsv(requireContext(), uri)) {
                 is CsvImporter.Result.Failure -> showToast(getString(R.string.import_failed, result.message))
                 is CsvImporter.Result.Success -> {
                     if (result.entries.isEmpty()) {

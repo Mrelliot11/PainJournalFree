@@ -1,6 +1,5 @@
 package com.example.paintrackerfree.ui.history
 
-import android.graphics.Canvas
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -73,10 +72,6 @@ class HistoryFragment : Fragment() {
                     .show()
             }
 
-            override fun onChildDraw(c: Canvas, rv: RecyclerView, vh: RecyclerView.ViewHolder,
-                dX: Float, dY: Float, actionState: Int, isActive: Boolean) {
-                super.onChildDraw(c, rv, vh, dX, dY, actionState, isActive)
-            }
         }
         ItemTouchHelper(swipeCallback).attachToRecyclerView(binding.rvHistory)
     }

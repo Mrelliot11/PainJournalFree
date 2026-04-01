@@ -18,9 +18,9 @@ class HistoryAdapter(private val onEntryClick: (PainEntry) -> Unit) :
         private const val TYPE_ENTRY = 1
 
         private val DIFF = object : DiffUtil.ItemCallback<HistoryItem>() {
-            override fun areItemsTheSame(a: HistoryItem, b: HistoryItem): Boolean = when {
-                a is HistoryItem.Header && b is HistoryItem.Header -> a.dateLabel == b.dateLabel
-                a is HistoryItem.Entry && b is HistoryItem.Entry -> a.entry.id == b.entry.id
+            override fun areItemsTheSame(a: HistoryItem, b: HistoryItem): Boolean = when (a) {
+                is HistoryItem.Header if b is HistoryItem.Header -> a.dateLabel == b.dateLabel
+                is HistoryItem.Entry if b is HistoryItem.Entry -> a.entry.id == b.entry.id
                 else -> false
             }
             override fun areContentsTheSame(a: HistoryItem, b: HistoryItem) = a == b
