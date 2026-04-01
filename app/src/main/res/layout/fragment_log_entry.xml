@@ -362,7 +362,6 @@
                         android:rating="3"
                         android:stepSize="1" />
 
-can
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

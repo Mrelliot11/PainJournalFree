@@ -3,12 +3,12 @@ package com.example.paintrackerfree.ui.logentry
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
-import android.view.*
-import android.widget.EditText
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import android.widget.Toast
+import androidx.core.view.isNotEmpty
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -23,6 +23,8 @@ import com.example.paintrackerfree.util.applyStatusBarPadding
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import java.util.Calendar
 
 class LogEntryFragment : Fragment() {
@@ -151,7 +153,7 @@ class LogEntryFragment : Fragment() {
                     }
                 }
             }
-            if (beforeLast && group.childCount > 0) {
+            if (beforeLast && group.isNotEmpty()) {
                 group.addView(chip, group.childCount - 1)
             } else {
                 group.addView(chip)
