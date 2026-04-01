@@ -7,6 +7,7 @@
     android:background="?android:colorBackground">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/blue_primary"
@@ -65,6 +66,7 @@
                         android:textColor="@color/blue_primary" />
 
                     <TextView
+                        android:id="@+id/tv_date_time"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
@@ -102,6 +104,7 @@
                         android:textColor="@color/blue_primary" />
 
                     <TextView
+                        android:id="@+id/tv_pain_level_value"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
@@ -126,6 +129,7 @@
                             android:textColor="@color/text_secondary" />
 
                         <com.google.android.material.slider.Slider
+                            android:id="@+id/slider_pain_level"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginHorizontal="8dp"
@@ -269,6 +273,7 @@
                     android:hint="@string/notes_hint">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_notes"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textMultiLine"
@@ -302,6 +307,7 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_medications"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:textSize="16sp" />
@@ -323,6 +329,7 @@
                         android:textColor="@color/text_primary" />
 
                     <RatingBar
+                        android:id="@+id/rating_mood"
                         style="@style/Widget.AppCompat.RatingBar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -346,6 +353,7 @@
                         android:textColor="@color/text_primary" />
 
                     <RatingBar
+                        android:id="@+id/rating_sleep"
                         style="@style/Widget.AppCompat.RatingBar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -372,6 +380,7 @@
 
             <!-- Buttons -->
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_save"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginBottom="10dp"
@@ -379,6 +388,7 @@
                 android:textSize="16sp" />
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_delete"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginBottom="8dp"
