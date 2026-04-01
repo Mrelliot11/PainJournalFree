@@ -1,0 +1,116 @@
+<resources>
+    <string name="app_name">Pain Tracker</string>
+
+    <!-- Nav -->
+    <string name="nav_home">Home</string>
+    <string name="nav_history">History</string>
+    <string name="nav_reports">Reports</string>
+
+    <!-- Screens -->
+    <string name="history">History</string>
+    <string name="reports">Reports</string>
+    <string name="log_pain">Log Pain</string>
+    <string name="edit_entry">Edit Entry</string>
+
+    <!-- Home -->
+    <string name="today">Today</string>
+    <string name="no_entries_yet">No entries yet today</string>
+    <string name="recent_entries">Recent Entries</string>
+    <string name="no_entries_logged">No pain entries logged yet.\nTap + to add your first entry.</string>
+    <plurals name="today_entries">
+        <item quantity="one">%d entry today</item>
+        <item quantity="other">%d entries today</item>
+    </plurals>
+    <string name="avg_pain_fmt">Avg pain: %.1f / 10</string>
+
+    <!-- Log Entry form -->
+    <string name="date_time">Date &amp; Time</string>
+    <string name="pain_level">Pain Level (0–10)</string>
+    <string name="body_location">Body Location</string>
+    <string name="pain_type">Pain Type</string>
+    <string name="triggers">Triggers</string>
+    <string name="medications_hint">Medications taken (optional)</string>
+    <string name="mood">Mood</string>
+    <string name="sleep_quality">Sleep Quality (last night)</string>
+    <string name="notes_hint">Notes (optional)</string>
+    <string name="save_entry">Save Entry</string>
+    <string name="delete_entry">Delete Entry</string>
+    <string name="entry_deleted">Entry deleted</string>
+    <string name="undo">Undo</string>
+
+    <!-- Reports -->
+    <string name="pain_trend">Pain Level Trend</string>
+    <string name="summary">Summary</string>
+    <string name="days_7">7 Days</string>
+    <string name="days_30">30 Days</string>
+    <string name="days_90">90 Days</string>
+    <string name="no_data_period">No entries in this period.</string>
+    <string name="export_csv">Export to CSV</string>
+    <string name="export_title">Share Pain Journal</string>
+    <string name="export_choose_title">Export</string>
+    <string name="export_save_downloads_csv">Save CSV to Downloads</string>
+    <string name="export_save_downloads_pdf">Save PDF to Downloads</string>
+    <string name="export_share_csv">Share CSV…</string>
+    <string name="export_share_pdf">Share PDF…</string>
+    <string name="export_saved_downloads">Saved to Downloads: %s</string>
+    <string name="export_save_failed">Failed to save file</string>
+    <string name="stat_avg_pain">Average Pain: %.1f / 10</string>
+    <string name="stat_count">Total Entries: %d</string>
+    <string name="stat_range">Pain Range: %d – %d</string>
+    <string name="stat_top_location">Most Affected: %s</string>
+    <string name="stat_top_trigger">Top Trigger: %s</string>
+    <string name="_0">0</string>
+    <string name="_10">10</string>
+    <string name="_5">5</string>
+
+    <!-- Chip arrays -->
+    <string-array name="body_locations">
+        <item>Head</item>
+        <item>Neck</item>
+        <item>Left Shoulder</item>
+        <item>Right Shoulder</item>
+        <item>Upper Back</item>
+        <item>Lower Back</item>
+        <item>Chest</item>
+        <item>Abdomen</item>
+        <item>Hips</item>
+        <item>Left Knee</item>
+        <item>Right Knee</item>
+        <item>Left Leg</item>
+        <item>Right Leg</item>
+        <item>Left Arm</item>
+        <item>Right Arm</item>
+        <item>Hands</item>
+        <item>Feet</item>
+        <item>Jaw</item>
+        <item>Widespread</item>
+    </string-array>
+
+    <string-array name="pain_types">
+        <item>Aching</item>
+        <item>Burning</item>
+        <item>Stabbing</item>
+        <item>Throbbing</item>
+        <item>Shooting</item>
+        <item>Cramping</item>
+        <item>Pressure</item>
+        <item>Tingling</item>
+        <item>Numbness</item>
+        <item>Stiffness</item>
+    </string-array>
+
+    <string-array name="triggers">
+        <item>Stress</item>
+        <item>Weather</item>
+        <item>Physical Activity</item>
+        <item>Poor Sleep</item>
+        <item>Food / Diet</item>
+        <item>Posture</item>
+        <item>Overexertion</item>
+        <item>Sitting Too Long</item>
+        <item>Standing Too Long</item>
+        <item>Menstrual Cycle</item>
+        <item>Unknown</item>
+    </string-array>
+
+</resources>
