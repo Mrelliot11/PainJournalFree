@@ -60,6 +60,7 @@ class LogEntryFragment : Fragment() {
         } else {
             binding.toolbar.title = getString(R.string.log_pain)
             binding.btnDelete.visibility = View.GONE
+            viewModel.checkTodayEntry()
         }
 
         setupChips()
@@ -87,6 +88,12 @@ class LogEntryFragment : Fragment() {
             binding.ratingMood.rating = entry.mood.toFloat()
             binding.ratingSleep.rating = entry.sleepQuality.toFloat()
             binding.etNotes.setText(entry.notes)
+        }
+
+        viewModel.hasTodayEntry.observe(viewLifecycleOwner) { hasEntry ->
+            if (entryId == 0L) {
+                binding.layoutSleepQuality.visibility = if (hasEntry) View.GONE else View.VISIBLE
+            }
         }
 
         viewModel.saved.observe(viewLifecycleOwner) { saved ->

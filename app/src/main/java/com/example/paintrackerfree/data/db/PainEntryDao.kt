@@ -22,6 +22,9 @@ interface PainEntryDao {
     @Query("SELECT COUNT(*) FROM pain_entries WHERE timestamp = :timestamp")
     suspend fun countByTimestamp(timestamp: Long): Int
 
+    @Query("SELECT COUNT(*) FROM pain_entries WHERE timestamp >= :startOfDay AND timestamp <= :endOfDay")
+    suspend fun countEntriesForDay(startOfDay: Long, endOfDay: Long): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entry: PainEntry): Long
 

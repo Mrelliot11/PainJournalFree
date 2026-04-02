@@ -13,6 +13,8 @@ class PainRepository(private val dao: PainEntryDao) {
 
     suspend fun getEntryById(id: Long): PainEntry? = dao.getEntryById(id)
     suspend fun existsByTimestamp(timestamp: Long): Boolean = dao.countByTimestamp(timestamp) > 0
+    suspend fun hasEntryToday(startOfDay: Long, endOfDay: Long): Boolean =
+        dao.countEntriesForDay(startOfDay, endOfDay) > 0
     suspend fun insert(entry: PainEntry): Long = dao.insert(entry)
     suspend fun update(entry: PainEntry) = dao.update(entry)
     suspend fun delete(entry: PainEntry) = dao.delete(entry)
