@@ -2,6 +2,8 @@ package com.example.paintrackerfree.ui.reports
 
 import android.os.Bundle
 import android.view.*
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
@@ -97,6 +99,19 @@ class ReportsFragment : Fragment() {
             }
         }
 
+        viewModel.triggerInsights.observe(viewLifecycleOwner) { categories ->
+            if (categories.isEmpty()) {
+                binding.cardInsights.visibility = View.GONE
+                return@observe
+            }
+            binding.cardInsights.visibility = View.VISIBLE
+            binding.llInsightsCategories.removeAllViews()
+            categories.forEachIndexed { index, category ->
+                if (index > 0) addDivider()
+                addCategorySection(category)
+            }
+        }
+
         binding.btnImport.setOnClickListener {
             importLauncher.launch(arrayOf("text/csv", "text/comma-separated-values", "*/*"))
         }
@@ -158,6 +173,52 @@ class ReportsFragment : Fragment() {
         else
             getString(R.string.export_save_failed)
         showToast(message)
+    }
+
+    private fun addCategorySection(category: InsightCategory) {
+        val ctx = requireContext()
+        val dp = resources.displayMetrics.density
+
+        val header = TextView(ctx).apply {
+            text = category.title
+            textSize = 14f
+            setTextColor(ctx.getColor(R.color.text_primary))
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+            setPadding(0, (8 * dp).toInt(), 0, (6 * dp).toInt())
+        }
+        binding.llInsightsCategories.addView(header)
+
+        category.items.forEach { (label, count) ->
+            val row = LinearLayout(ctx).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(0, (2 * dp).toInt(), 0, (2 * dp).toInt())
+            }
+            val tvLabel = TextView(ctx).apply {
+                text = label
+                textSize = 13f
+                setTextColor(ctx.getColor(R.color.text_primary))
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            }
+            val tvCount = TextView(ctx).apply {
+                text = resources.getQuantityString(R.plurals.insights_count, count, count)
+                textSize = 13f
+                setTextColor(ctx.getColor(R.color.text_secondary))
+            }
+            row.addView(tvLabel)
+            row.addView(tvCount)
+            binding.llInsightsCategories.addView(row)
+        }
+    }
+
+    private fun addDivider() {
+        val dp = resources.displayMetrics.density
+        val divider = View(requireContext()).apply {
+            setBackgroundColor(requireContext().getColor(R.color.divider))
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, (1 * dp).toInt()
+            ).apply { topMargin = (8 * dp).toInt() }
+        }
+        binding.llInsightsCategories.addView(divider)
     }
 
     override fun onDestroyView() {
