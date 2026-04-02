@@ -64,6 +64,12 @@
     <string name="stat_range">Pain Range: %d – %d</string>
     <string name="stat_top_location">Most Affected: %s</string>
     <string name="stat_top_trigger">Top Trigger: %s</string>
+    <string name="insights_title">Trigger Insights</string>
+    <string name="insights_subtitle">Factors most often logged on high pain days (pain ≥ 7)</string>
+    <plurals name="insights_count">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
     <string name="_0">0</string>
     <string name="_10">10</string>
     <string name="_5">5</string>
