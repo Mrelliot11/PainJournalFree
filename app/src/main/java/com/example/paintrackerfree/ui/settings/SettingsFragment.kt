@@ -1,24 +1,39 @@
 package com.example.paintrackerfree.ui.settings
 
-import android.app.AlertDialog
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.text.InputType
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.android.billingclient.api.*
-import com.google.android.material.chip.Chip
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
+import com.android.billingclient.api.AcknowledgePurchaseParams
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.BillingClientStateListener
+import com.android.billingclient.api.BillingFlowParams
+import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.PurchasesUpdatedListener
+import com.android.billingclient.api.QueryProductDetailsParams
+import com.example.paintrackerfree.MainActivity
 import com.example.paintrackerfree.PainTrackerApp
 import com.example.paintrackerfree.R
 import com.example.paintrackerfree.databinding.FragmentSettingsBinding
 import com.example.paintrackerfree.util.CustomOptionsStore
+import com.example.paintrackerfree.util.ReminderScheduler
+import com.example.paintrackerfree.util.ReminderStore
 import com.example.paintrackerfree.util.ThemeStore
 import com.example.paintrackerfree.util.ViewModelFactory
 import com.example.paintrackerfree.util.applyStatusBarPadding
+import com.google.android.material.chip.Chip
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
+import java.util.Locale
 
 class SettingsFragment : Fragment() {
 
@@ -32,6 +47,7 @@ class SettingsFragment : Fragment() {
     private var billingClient: BillingClient? = null
 
     // Product IDs — these must match what you create in the Google Play Console
+    @Suppress("PrivatePropertyName", "PrivatePropertyName", "PrivatePropertyName")
     private val TIP_SMALL = "tip_small"
     private val TIP_MEDIUM = "tip_medium"
     private val TIP_LARGE = "tip_large"
@@ -48,6 +64,7 @@ class SettingsFragment : Fragment() {
         binding.appBar.applyStatusBarPadding()
 
         setupThemeSelector()
+        setupReminders()
         setupCustomOptions()
         setupDeleteAll()
         setupBilling()
@@ -72,6 +89,86 @@ class SettingsFragment : Fragment() {
             }
             ThemeStore.setMode(requireContext(), mode)
         }
+    }
+
+    // --- Reminders ---
+
+    private fun setupReminders() {
+        (activity as? MainActivity)?.requestNotificationPermissionIfNeeded()
+        refreshReminderList()
+        binding.btnAddReminder.setOnClickListener { showAddReminderPicker() }
+    }
+
+    private fun refreshReminderList() {
+        binding.llReminders.removeAllViews()
+        val times = ReminderStore.getTimes(requireContext())
+        if (times.isEmpty()) {
+            val tv = TextView(requireContext()).apply {
+                text = getString(R.string.settings_no_reminders)
+                textSize = 13f
+                setTextColor(requireContext().getColor(R.color.text_secondary))
+            }
+            binding.llReminders.addView(tv)
+        } else {
+            val dp = resources.displayMetrics.density
+            times.forEach { hhmm ->
+                val row = LinearLayout(requireContext()).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    gravity = android.view.Gravity.CENTER_VERTICAL
+                    setPadding(0, (4 * dp).toInt(), 0, (4 * dp).toInt())
+                }
+                val tvTime = TextView(requireContext()).apply {
+                    text = formatHhmm(hhmm)
+                    textSize = 15f
+                    setTextColor(requireContext().getColor(R.color.text_primary))
+                    layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                }
+                val btnRemove = android.widget.Button(
+                    requireContext(),
+                    null,
+                    android.R.attr.borderlessButtonStyle
+                ).apply {
+                    text = getString(R.string.settings_reminder_remove)
+                    textSize = 13f
+                    setTextColor(requireContext().getColor(R.color.pain_high))
+                    setOnClickListener {
+                        ReminderScheduler.cancel(requireContext(), hhmm)
+                        ReminderStore.removeTime(requireContext(), hhmm)
+                        refreshReminderList()
+                    }
+                }
+                row.addView(tvTime)
+                row.addView(btnRemove)
+                binding.llReminders.addView(row)
+            }
+        }
+    }
+
+    private fun showAddReminderPicker() {
+        val cal = java.util.Calendar.getInstance()
+        TimePickerDialog(
+            requireContext(),
+            { _, hour, minute ->
+                val hhmm = String.format(Locale.US, "%02d:%02d", hour, minute)
+                ReminderStore.addTime(requireContext(), hhmm)
+                ReminderScheduler.schedule(requireContext(), hhmm)
+                refreshReminderList()
+            },
+            cal.get(java.util.Calendar.HOUR_OF_DAY),
+            cal.get(java.util.Calendar.MINUTE),
+            false
+        ).show()
+    }
+
+    private fun formatHhmm(hhmm: String): String {
+        val (h, m) = hhmm.split(":").map { it.toInt() }
+        val ampm = if (h < 12) "AM" else "PM"
+        val hour12 = when {
+            h == 0 -> 12
+            h > 12 -> h - 12
+            else -> h
+        }
+        return String.format(Locale.US, "%d:%02d %s", hour12, m, ampm)
     }
 
     // --- Custom options ---

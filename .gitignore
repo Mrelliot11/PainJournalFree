@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+TODO.md
+settings.gradle.kts
+.gitignore
+*Test.kt
