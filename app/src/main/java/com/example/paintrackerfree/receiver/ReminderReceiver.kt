@@ -9,6 +9,7 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.example.paintrackerfree.MainActivity
 import com.example.paintrackerfree.R
+import com.example.paintrackerfree.util.ReminderScheduler
 
 class ReminderReceiver : BroadcastReceiver() {
 
@@ -37,6 +38,11 @@ class ReminderReceiver : BroadcastReceiver() {
             val (h, m) = hhmm.split(":").map { it.toInt() }
             h * 100 + m
         } else 0
+
+        // Reschedule for tomorrow — setExactAndAllowWhileIdle is one-shot
+        if (hhmm.isNotBlank()) {
+            ReminderScheduler.schedule(context, hhmm)
+        }
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
