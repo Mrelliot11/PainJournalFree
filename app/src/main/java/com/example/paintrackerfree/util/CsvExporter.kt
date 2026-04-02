@@ -58,8 +58,10 @@ object CsvExporter {
     }
 
     private fun writeCsvToCache(context: Context, entries: List<PainEntry>): File {
-        val dir = context.getExternalFilesDir("exports")?.also { it.mkdirs() }
-        val file = File(dir, "pain_journal_${System.currentTimeMillis()}.csv")
+        val file = File(
+            context.getExternalFilesDir(null),
+            "pain_journal_${System.currentTimeMillis()}.csv"
+        )
         file.writeText(buildCsvContent(entries))
         return file
     }

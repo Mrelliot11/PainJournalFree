@@ -67,8 +67,10 @@ object PdfExporter {
     }
 
     private fun writePdfToCache(context: Context, entries: List<PainEntry>): File {
-        val dir = context.getExternalFilesDir("exports")?.also { it.mkdirs() }
-        val file = File(dir, "pain_journal_${System.currentTimeMillis()}.pdf")
+        val file = File(
+            context.getExternalFilesDir(null),
+            "pain_journal_${System.currentTimeMillis()}.pdf"
+        )
         file.outputStream().use { buildPdf(entries).writeTo(it) }
         return file
     }
