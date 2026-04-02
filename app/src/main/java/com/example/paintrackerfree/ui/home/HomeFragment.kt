@@ -32,10 +32,13 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.appBar.applyStatusBarPadding()
 
-        val adapter = HistoryAdapter { entry ->
-            findNavController().navigate(R.id.action_home_to_logEntry,
-                Bundle().apply { putLong("entryId", entry.id) })
-        }
+        val adapter = HistoryAdapter(
+            onEntryClick = { entry ->
+                findNavController().navigate(R.id.action_home_to_logEntry,
+                    Bundle().apply { putLong("entryId", entry.id) })
+            },
+            showDate = true
+        )
         binding.rvRecentEntries.layoutManager = LinearLayoutManager(requireContext())
         binding.rvRecentEntries.adapter = adapter
         binding.rvRecentEntries.isNestedScrollingEnabled = false

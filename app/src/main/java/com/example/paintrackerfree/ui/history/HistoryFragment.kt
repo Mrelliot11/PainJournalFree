@@ -35,10 +35,10 @@ class HistoryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.appBar.applyStatusBarPadding()
 
-        val adapter = HistoryAdapter { entry ->
+        val adapter = HistoryAdapter(onEntryClick = { entry ->
             findNavController().navigate(R.id.action_history_to_logEntry,
                 Bundle().apply { putLong("entryId", entry.id) })
-        }
+        })
         binding.rvHistory.layoutManager = LinearLayoutManager(requireContext())
         binding.rvHistory.adapter = adapter
 

@@ -10,7 +10,10 @@ import com.example.paintrackerfree.databinding.ItemDateHeaderBinding
 import com.example.paintrackerfree.databinding.ItemPainEntryBinding
 import com.example.paintrackerfree.util.DateUtils
 
-class HistoryAdapter(private val onEntryClick: (PainEntry) -> Unit) :
+class HistoryAdapter(
+    private val onEntryClick: (PainEntry) -> Unit,
+    private val showDate: Boolean = false
+) :
     ListAdapter<HistoryItem, RecyclerView.ViewHolder>(DIFF) {
 
     companion object {
@@ -44,7 +47,7 @@ class HistoryAdapter(private val onEntryClick: (PainEntry) -> Unit) :
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = getItem(position)) {
             is HistoryItem.Header -> (holder as HeaderVH).bind(item)
-            is HistoryItem.Entry -> (holder as EntryVH).bind(item.entry)
+            is HistoryItem.Entry -> (holder as EntryVH).bind(item.entry, showDate)
         }
     }
 
@@ -56,8 +59,12 @@ class HistoryAdapter(private val onEntryClick: (PainEntry) -> Unit) :
     }
 
     inner class EntryVH(private val b: ItemPainEntryBinding) : RecyclerView.ViewHolder(b.root) {
-        fun bind(entry: PainEntry) {
-            b.tvTime.text = DateUtils.formatTime(entry.timestamp)
+        fun bind(entry: PainEntry, showDate: Boolean = false) {
+            b.tvTime.text = if (showDate) {
+                "${DateUtils.toDateHeader(entry.timestamp)} · ${DateUtils.formatTime(entry.timestamp)}"
+            } else {
+                DateUtils.formatTime(entry.timestamp)
+            }
             b.tvPainLevel.text = entry.painLevel.toString()
             b.tvPainLevel.setBackgroundResource(painLevelColor(entry.painLevel))
             b.tvLocations.text = entry.locations.ifBlank { "No location" }
