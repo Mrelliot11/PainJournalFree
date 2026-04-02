@@ -28,6 +28,11 @@
         android:label="Reports" />
 
     <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.paintrackerfree.ui.settings.SettingsFragment"
+        android:label="Settings" />
+
+    <fragment
         android:id="@+id/logEntryFragment"
         android:name="com.example.paintrackerfree.ui.logentry.LogEntryFragment"
         android:label="Log Entry">
