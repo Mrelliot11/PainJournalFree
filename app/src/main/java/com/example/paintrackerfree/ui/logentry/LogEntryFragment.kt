@@ -110,26 +110,26 @@ class LogEntryFragment : Fragment() {
     private fun setupChips() {
         val ctx = requireContext()
         addChips(binding.chipGroupLocations, resources.getStringArray(R.array.body_locations))
-        addChips(binding.chipGroupLocations, CustomOptionsStore.getLocations(ctx).toTypedArray(), isCustom = true)
+        addChips(binding.chipGroupLocations, CustomOptionsStore.getLocations(ctx).toTypedArray())
         addAddCustomChip(binding.chipGroupLocations) { value ->
             CustomOptionsStore.addLocation(ctx, value)
-            addChips(binding.chipGroupLocations, arrayOf(value), isCustom = true, beforeLast = true)
+            addChips(binding.chipGroupLocations, arrayOf(value), beforeLast = true)
             checkChipByTag(binding.chipGroupLocations, value)
         }
 
         addChips(binding.chipGroupPainTypes, resources.getStringArray(R.array.pain_types))
-        addChips(binding.chipGroupPainTypes, CustomOptionsStore.getPainTypes(ctx).toTypedArray(), isCustom = true)
+        addChips(binding.chipGroupPainTypes, CustomOptionsStore.getPainTypes(ctx).toTypedArray())
         addAddCustomChip(binding.chipGroupPainTypes) { value ->
             CustomOptionsStore.addPainType(ctx, value)
-            addChips(binding.chipGroupPainTypes, arrayOf(value), isCustom = true, beforeLast = true)
+            addChips(binding.chipGroupPainTypes, arrayOf(value), beforeLast = true)
             checkChipByTag(binding.chipGroupPainTypes, value)
         }
 
         addChips(binding.chipGroupTriggers, resources.getStringArray(R.array.triggers))
-        addChips(binding.chipGroupTriggers, CustomOptionsStore.getTriggers(ctx).toTypedArray(), isCustom = true)
+        addChips(binding.chipGroupTriggers, CustomOptionsStore.getTriggers(ctx).toTypedArray())
         addAddCustomChip(binding.chipGroupTriggers) { value ->
             CustomOptionsStore.addTrigger(ctx, value)
-            addChips(binding.chipGroupTriggers, arrayOf(value), isCustom = true, beforeLast = true)
+            addChips(binding.chipGroupTriggers, arrayOf(value), beforeLast = true)
             checkChipByTag(binding.chipGroupTriggers, value)
         }
     }
@@ -137,7 +137,6 @@ class LogEntryFragment : Fragment() {
     private fun addChips(
         group: ChipGroup,
         labels: Array<String>,
-        isCustom: Boolean = false,
         beforeLast: Boolean = false
     ) {
         labels.forEach { label ->
@@ -145,13 +144,6 @@ class LogEntryFragment : Fragment() {
                 text = label
                 isCheckable = true
                 tag = label
-                if (isCustom) {
-                    isCloseIconVisible = true
-                    setOnCloseIconClickListener {
-                        group.removeView(this)
-                        removeCustomOption(group, label)
-                    }
-                }
             }
             if (beforeLast && group.isNotEmpty()) {
                 group.addView(chip, group.childCount - 1)
@@ -196,15 +188,6 @@ class LogEntryFragment : Fragment() {
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
-    }
-
-    private fun removeCustomOption(group: ChipGroup, value: String) {
-        val ctx = requireContext()
-        when (group.id) {
-            R.id.chip_group_locations -> CustomOptionsStore.removeLocation(ctx, value)
-            R.id.chip_group_pain_types -> CustomOptionsStore.removePainType(ctx, value)
-            R.id.chip_group_triggers -> CustomOptionsStore.removeTrigger(ctx, value)
-        }
     }
 
     private fun checkChipByTag(group: ChipGroup, tag: String) {
