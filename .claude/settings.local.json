@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(./gradlew assembleDebug)",
-      "Bash(./gradlew compileDebugKotlin)"
+      "Bash(./gradlew compileDebugKotlin)",
+      "Bash(grep -rn -E \"\\(api_key|apikey|secret|password|token|private_key\\)\\\\s*[:=]\\\\s*['\\\\\"][^'\\\\\"]{6,}\" --include=\"*.kt\" --include=\"*.java\" --include=\"*.xml\" --include=\"*.json\" .)",
+      "Bash(./gradlew test:*)",
+      "Bash(gh repo:*)",
+      "Bash(gh label:*)",
+      "Bash(gh issue:*)",
+      "Bash(git checkout:*)"
     ]
   },
   "prefersReducedMotion": false
