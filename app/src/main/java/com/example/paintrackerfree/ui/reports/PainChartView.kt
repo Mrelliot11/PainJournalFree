@@ -16,7 +16,13 @@ class PainChartView @JvmOverloads constructor(
 ) : View(context, attrs, defStyle) {
 
     var entries: List<PainEntry> = emptyList()
-        set(value) { field = value.sortedBy { it.timestamp }; invalidate() }
+        set(value) {
+            field = value.sortedBy { it.timestamp }
+            dailyPoints = computeDailyPoints(field)
+            invalidate()
+        }
+
+    private var dailyPoints: List<Pair<Long, Float>> = emptyList()
 
     private val padL = 80f
     private val padR = 24f
@@ -24,6 +30,17 @@ class PainChartView @JvmOverloads constructor(
     private val padB = 56f
 
     private val dayFormat = SimpleDateFormat("yyyyMMdd", Locale.US)
+
+    private fun computeDailyPoints(sorted: List<PainEntry>): List<Pair<Long, Float>> =
+        sorted
+            .groupBy { dayFormat.format(Date(it.timestamp)) }
+            .entries
+            .sortedBy { it.key }
+            .map { (_, dayEntries) ->
+                val midTs = dayEntries.map { it.timestamp }.average().toLong()
+                val avgLevel = dayEntries.map { it.painLevel }.average().toFloat()
+                midTs to avgLevel
+            }
 
     private val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = "#E0E0E0".toColorInt(); strokeWidth = 1f
@@ -37,6 +54,8 @@ class PainChartView @JvmOverloads constructor(
         color = "#757575".toColorInt()
         textSize = resources.displayMetrics.scaledDensity * 13f
     }
+    private val linePath = Path()
+
     private val emptyPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = "#BDBDBD".toColorInt()
         textSize = resources.displayMetrics.scaledDensity * 16f
@@ -61,21 +80,10 @@ class PainChartView @JvmOverloads constructor(
             canvas.drawText(i.toString(), padL - 28f, y + labelPaint.textSize / 3f, labelPaint)
         }
 
-        if (entries.isEmpty()) {
+        if (dailyPoints.isEmpty()) {
             canvas.drawText("No data for this period", w / 2f, h / 2f, emptyPaint)
             return
         }
-
-        // Average pain per calendar day so multiple same-day entries don't cause vertical spikes
-        val dailyPoints: List<Pair<Long, Float>> = entries
-            .groupBy { dayFormat.format(Date(it.timestamp)) }
-            .entries
-            .sortedBy { it.key }
-            .map { (_, dayEntries) ->
-                val midTs = dayEntries.map { it.timestamp }.average().toLong()
-                val avgLevel = dayEntries.map { it.painLevel }.average().toFloat()
-                midTs to avgLevel
-            }
 
         val minT = dailyPoints.first().first.toFloat()
         val maxT = dailyPoints.last().first.toFloat()
@@ -85,11 +93,11 @@ class PainChartView @JvmOverloads constructor(
         fun yOf(level: Float) = padT + chartH * (1f - level / 10f)
 
         // Line path — reset each draw to avoid accumulation across invalidations
-        val path = Path()
+        linePath.reset()
         dailyPoints.forEachIndexed { i, (ts, lvl) ->
-            if (i == 0) path.moveTo(xOf(ts), yOf(lvl)) else path.lineTo(xOf(ts), yOf(lvl))
+            if (i == 0) linePath.moveTo(xOf(ts), yOf(lvl)) else linePath.lineTo(xOf(ts), yOf(lvl))
         }
-        canvas.drawPath(path, linePaint)
+        canvas.drawPath(linePath, linePaint)
 
         // Dots
         dailyPoints.forEach { (ts, lvl) ->
