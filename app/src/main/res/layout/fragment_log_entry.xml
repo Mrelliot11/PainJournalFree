@@ -338,29 +338,37 @@
                         android:rating="3"
                         android:stepSize="1" />
 
-                    <View
+                    <LinearLayout
+                        android:id="@+id/layout_sleep_quality"
                         android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="14dp"
-                        android:background="@color/divider" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/sleep_quality"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_primary" />
+                        android:orientation="vertical">
 
-                    <RatingBar
-                        android:id="@+id/rating_sleep"
-                        style="@style/Widget.AppCompat.RatingBar"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:numStars="5"
-                        android:rating="3"
-                        android:stepSize="1" />
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="14dp"
+                            android:background="@color/divider" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/sleep_quality"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary" />
+
+                        <RatingBar
+                            android:id="@+id/rating_sleep"
+                            style="@style/Widget.AppCompat.RatingBar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:numStars="5"
+                            android:rating="3"
+                            android:stepSize="1" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

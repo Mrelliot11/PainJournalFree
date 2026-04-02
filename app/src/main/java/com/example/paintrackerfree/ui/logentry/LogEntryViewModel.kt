@@ -3,6 +3,7 @@ package com.example.paintrackerfree.ui.logentry
 import androidx.lifecycle.*
 import com.example.paintrackerfree.data.model.PainEntry
 import com.example.paintrackerfree.data.repository.PainRepository
+import com.example.paintrackerfree.util.DateUtils
 import kotlinx.coroutines.launch
 
 class LogEntryViewModel(private val repository: PainRepository) : ViewModel() {
@@ -15,6 +16,17 @@ class LogEntryViewModel(private val repository: PainRepository) : ViewModel() {
 
     private val _existingEntry = MutableLiveData<PainEntry?>()
     val existingEntry: LiveData<PainEntry?> = _existingEntry
+
+    private val _hasTodayEntry = MutableLiveData<Boolean>()
+    val hasTodayEntry: LiveData<Boolean> = _hasTodayEntry
+
+    fun checkTodayEntry() {
+        viewModelScope.launch {
+            _hasTodayEntry.value = repository.hasEntryToday(
+                DateUtils.startOfDay(), DateUtils.endOfDay()
+            )
+        }
+    }
 
     fun loadEntry(id: Long) {
         viewModelScope.launch {
