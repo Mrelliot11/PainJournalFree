@@ -86,6 +86,10 @@ com.example.paintrackerfree/
   util/
     DateUtils.kt               Timestamp formatting helpers
     CsvExporter.kt             Writes CSV to getExternalFilesDir, returns FileProvider URI
+CsvImporter.kt             Parses a CSV URI into List<PainEntry>; returns sealed Result
+    PdfExporter.kt             Renders entries to a PDF via android.graphics.pdf.PdfDocument
+    CustomOptionsStore.kt      SharedPreferences store for user-added chip options (locations, pain types, triggers)
+    WindowInsets.kt            applyStatusBarPadding() extension on View
     ViewModelFactory.kt        ViewModelProvider.Factory wrapping PainRepository
 ```
 
