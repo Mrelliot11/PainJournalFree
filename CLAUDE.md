@@ -57,7 +57,7 @@ MainActivity
 ├── NavHostFragment
 │   ├── HomeFragment          (today's stats + recent entries + FAB)
 │   ├── HistoryFragment       (full list with date headers, swipe-to-delete)
-│   ├── ReportsFragment       (chart + stats + CSV export)
+│   ├── ReportsFragment       (chart + stats + CSV/PDF export)
 │   └── LogEntryFragment      (add/edit form; receives entryId: Long arg, 0 = new)
 └── BottomNavigationView      (hidden when LogEntryFragment is active)
 ```
@@ -73,10 +73,9 @@ com.example.paintrackerfree/
   PainTrackerApp.kt            Application; exposes .repository singleton
   MainActivity.kt
   data/
-    model/PainEntry.kt         @Entity; multi-select fields stored as comma-joined strings
+    model/PainEntry.kt         @Entity; multi-select fields stored as comma-joined strings directly (no TypeConverters)
     db/PainDatabase.kt         @Database singleton
     db/PainEntryDao.kt         @Dao; all queries return Flow or suspend
-    db/Converters.kt           @TypeConverter for List<String> ↔ String
     repository/PainRepository.kt
   ui/
     home/                      HomeFragment + HomeViewModel
@@ -85,9 +84,9 @@ com.example.paintrackerfree/
     reports/                   ReportsFragment + ReportsViewModel + PainChartView
   util/
     DateUtils.kt               Timestamp formatting helpers
-    CsvExporter.kt             Writes CSV to getExternalFilesDir, returns FileProvider URI
-CsvImporter.kt             Parses a CSV URI into List<PainEntry>; returns sealed Result
-    PdfExporter.kt             Renders entries to a PDF via android.graphics.pdf.PdfDocument
+    CsvExporter.kt             Writes CSV to exports/ subdir, returns FileProvider URI; also saves to Downloads
+    CsvImporter.kt             Parses a CSV URI into List<PainEntry>; returns sealed Result
+    PdfExporter.kt             Renders entries to a PDF via android.graphics.pdf.PdfDocument; share intent + save to Downloads
     CustomOptionsStore.kt      SharedPreferences store for user-added chip options (locations, pain types, triggers)
     WindowInsets.kt            applyStatusBarPadding() extension on View
     ViewModelFactory.kt        ViewModelProvider.Factory wrapping PainRepository
@@ -98,7 +97,7 @@ CsvImporter.kt             Parses a CSV URI into List<PainEntry>; returns sealed
 - **ViewBinding** is enabled. Every Fragment uses the `_binding`/`binding` nullable pattern; always null out in `onDestroyView`.
 - **Navigation IDs must match**: bottom nav menu item IDs in `res/menu/bottom_nav_menu.xml` must exactly match the destination IDs in `res/navigation/nav_graph.xml` for `NavigationUI.setupWithNavController` to work.
 - **LogEntry nav argument**: `entryId: Long`, default `0L`. Value `0` means new entry; any positive value means edit.
-- **Multi-select chips** (body locations, pain types, triggers) are stored as comma-separated strings. The predefined option lists live in `res/values/strings.xml` as `<string-array>` resources.
+- **Multi-select chips** (body locations, pain types, triggers) are stored as comma-separated strings directly on `PainEntry` — there is no `Converters.kt` or `@TypeConverter` class.
 - **PainChartView** (`ui/reports/PainChartView.kt`) is a custom `View` drawn entirely with `Canvas`/`Paint`/`Path` — no external chart library.
-- **CSV export** uses `androidx.core.content.FileProvider` with authority `com.example.paintrackerfree.fileprovider`. The paths config is at `res/xml/file_paths.xml`.
+- **Export files** are written to `getExternalFilesDir("exports")` and shared via FileProvider with authority `${packageName}.fileprovider`. The paths config is at `res/xml/file_paths.xml` (scoped to `exports/`).
 - Theme is `Theme.MaterialComponents.DayNight.NoActionBar`. Each fragment owns its own `MaterialToolbar`.

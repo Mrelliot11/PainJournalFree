@@ -30,4 +30,7 @@ interface PainEntryDao {
 
     @Delete
     suspend fun delete(entry: PainEntry)
+
+    @Query("DELETE FROM pain_entries")
+    suspend fun deleteAll()
 }

@@ -16,4 +16,5 @@ class PainRepository(private val dao: PainEntryDao) {
     suspend fun insert(entry: PainEntry): Long = dao.insert(entry)
     suspend fun update(entry: PainEntry) = dao.update(entry)
     suspend fun delete(entry: PainEntry) = dao.delete(entry)
+    suspend fun deleteAll() = dao.deleteAll()
 }

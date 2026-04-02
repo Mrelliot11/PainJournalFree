@@ -7,6 +7,7 @@ import com.example.paintrackerfree.ui.history.HistoryViewModel
 import com.example.paintrackerfree.ui.home.HomeViewModel
 import com.example.paintrackerfree.ui.logentry.LogEntryViewModel
 import com.example.paintrackerfree.ui.reports.ReportsViewModel
+import com.example.paintrackerfree.ui.settings.SettingsViewModel
 
 class ViewModelFactory(private val repository: PainRepository) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
@@ -15,6 +16,7 @@ class ViewModelFactory(private val repository: PainRepository) : ViewModelProvid
         HistoryViewModel::class.java -> HistoryViewModel(repository)
         ReportsViewModel::class.java -> ReportsViewModel(repository)
         LogEntryViewModel::class.java -> LogEntryViewModel(repository)
+        SettingsViewModel::class.java -> SettingsViewModel(repository)
         else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
     } as T
 }
