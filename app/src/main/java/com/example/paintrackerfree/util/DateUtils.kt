@@ -9,11 +9,13 @@ object DateUtils {
     private var timeFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
     private var dateHeaderFormat = SimpleDateFormat("EEEE, MMMM d", Locale.getDefault())
     private var chartDateFormat = SimpleDateFormat("M/d", Locale.getDefault())
+    private var chartDateYearFormat = SimpleDateFormat("M/d/yyyy", Locale.getDefault())
     private var csvDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
     fun formatDateTime(epochMs: Long): String = dateTimeFormat.format(Date(epochMs))
     fun formatTime(epochMs: Long): String = timeFormat.format(Date(epochMs))
     fun formatChartDate(epochMs: Long): String = chartDateFormat.format(Date(epochMs))
+    fun formatChartDateYear(epochMs: Long): String = chartDateYearFormat.format(Date(epochMs))
     fun formatCsv(epochMs: Long): String = csvDateFormat.format(Date(epochMs))
 
     fun toDateHeader(epochMs: Long): String {

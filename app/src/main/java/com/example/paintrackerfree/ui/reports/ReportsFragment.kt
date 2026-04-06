@@ -4,21 +4,14 @@ import android.os.Bundle
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.paintrackerfree.PainTrackerApp
 import com.example.paintrackerfree.R
 import com.example.paintrackerfree.databinding.FragmentReportsBinding
 import com.example.paintrackerfree.util.applyStatusBarPadding
-import com.example.paintrackerfree.util.CsvExporter
-import com.example.paintrackerfree.util.CsvImporter
-import com.example.paintrackerfree.util.PdfExporter
 import com.example.paintrackerfree.util.ViewModelFactory
 import com.google.android.material.chip.Chip
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.*
 
 class ReportsFragment : Fragment() {
 
@@ -27,38 +20,6 @@ class ReportsFragment : Fragment() {
 
     private val viewModel: ReportsViewModel by viewModels {
         ViewModelFactory((requireActivity().application as PainTrackerApp).repository)
-    }
-
-    private val importLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        uri ?: return@registerForActivityResult
-        runInBackground {
-            when (val result = CsvImporter.parseCsv(requireContext(), uri)) {
-                is CsvImporter.Result.Failure -> showToast(getString(R.string.import_failed, result.message))
-                is CsvImporter.Result.Success -> {
-                    if (result.entries.isEmpty()) {
-                        showToast(getString(R.string.import_nothing))
-                        return@runInBackground
-                    }
-                    val repo = (requireActivity().application as PainTrackerApp).repository
-                    // Deduplicate in memory, then insert in one transaction so Room
-                    // emits a single Flow update and all LiveData observers refresh together.
-                    val existingTimestamps = result.entries
-                        .filter { repo.existsByTimestamp(it.timestamp) }
-                        .map { it.timestamp }
-                        .toHashSet()
-                    val toInsert = result.entries.filter { it.timestamp !in existingTimestamps }
-                    if (toInsert.isNotEmpty()) repo.insertAll(toInsert)
-                    val duplicates = existingTimestamps.size
-                    val inserted = toInsert.size
-                    val totalSkipped = result.skipped + duplicates
-                    val msg = if (totalSkipped > 0)
-                        getString(R.string.import_success_skipped, inserted, totalSkipped)
-                    else
-                        getString(R.string.import_success, inserted)
-                    showToast(msg)
-                }
-            }
-        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -121,49 +82,6 @@ class ReportsFragment : Fragment() {
             }
         }
 
-        binding.btnImport.setOnClickListener {
-            importLauncher.launch(arrayOf("text/csv", "text/comma-separated-values", "*/*"))
-        }
-
-        binding.btnExport.setOnClickListener {
-            val entries = viewModel.filteredEntries.value ?: return@setOnClickListener
-            if (entries.isEmpty()) return@setOnClickListener
-
-            val options = arrayOf(
-                getString(R.string.export_save_downloads_csv),
-                getString(R.string.export_share_csv),
-                getString(R.string.export_save_downloads_pdf),
-                getString(R.string.export_share_pdf)
-            )
-
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.export_choose_title)
-                .setItems(options) { _, which ->
-                    when (which) {
-                        0 -> runInBackground {
-                            val name = CsvExporter.saveToDownloads(requireContext(), entries)
-                            showSaveResult(name)
-                        }
-                        1 -> runInBackground {
-                            val intent = CsvExporter.buildShareIntent(requireContext(), entries)
-                            withContext(Dispatchers.Main) {
-                                startActivity(android.content.Intent.createChooser(intent, getString(R.string.export_title)))
-                            }
-                        }
-                        2 -> runInBackground {
-                            val name = PdfExporter.saveToDownloads(requireContext(), entries)
-                            showSaveResult(name)
-                        }
-                        3 -> runInBackground {
-                            val intent = PdfExporter.buildShareIntent(requireContext(), entries)
-                            withContext(Dispatchers.Main) {
-                                startActivity(android.content.Intent.createChooser(intent, getString(R.string.export_title)))
-                            }
-                        }
-                    }
-                }
-                .show()
-        }
     }
 
     private fun rebuildPainTypeChips(types: List<String>) {
@@ -222,24 +140,6 @@ class ReportsFragment : Fragment() {
         }
 
         binding.locationFilterRow.visibility = if (locations.isEmpty()) View.GONE else View.VISIBLE
-    }
-
-    private fun runInBackground(block: suspend CoroutineScope.() -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch(block = block)
-    }
-
-    private suspend fun showToast(message: String) {
-        withContext(Dispatchers.Main) {
-            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
-        }
-    }
-
-    private suspend fun showSaveResult(fileName: String?) {
-        val message = if (fileName != null)
-            getString(R.string.export_saved_downloads, fileName)
-        else
-            getString(R.string.export_save_failed)
-        showToast(message)
     }
 
     private fun addCategorySection(category: InsightCategory) {

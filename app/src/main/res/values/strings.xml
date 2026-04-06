@@ -106,6 +106,16 @@
     <string name="settings_custom_pain_types">Custom Pain Types</string>
     <string name="settings_custom_triggers">Custom Triggers</string>
     <string name="settings_no_custom">None added yet</string>
+    <string name="settings_import_export">Import &amp; Export</string>
+    <string name="settings_import_export_description">Export your pain journal as CSV or PDF. Import from a previously exported CSV to restore or merge entries.</string>
+    <string name="export_range_title">Export range</string>
+    <string name="export_range_all">All entries</string>
+    <string name="export_range_30">Last 30 days</string>
+    <string name="export_range_90">Last 90 days</string>
+    <string name="export_range_custom">Custom date range…</string>
+    <string name="export_range_empty">No entries in that range</string>
+    <string name="export_date_start">Start date</string>
+    <string name="export_date_end">End date</string>
     <string name="settings_data">Data</string>
     <string name="settings_delete_all">Delete all entries</string>
     <string name="settings_delete_all_confirm_title">Delete all entries?</string>

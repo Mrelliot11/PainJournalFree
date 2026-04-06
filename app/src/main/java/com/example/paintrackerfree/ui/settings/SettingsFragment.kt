@@ -1,5 +1,6 @@
 package com.example.paintrackerfree.ui.settings
 
+import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
 import android.text.InputType
@@ -9,6 +10,8 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -24,7 +27,11 @@ import com.example.paintrackerfree.MainActivity
 import com.example.paintrackerfree.PainTrackerApp
 import com.example.paintrackerfree.R
 import com.example.paintrackerfree.databinding.FragmentSettingsBinding
+import com.example.paintrackerfree.util.CsvExporter
+import com.example.paintrackerfree.util.CsvImporter
 import com.example.paintrackerfree.util.CustomOptionsStore
+import com.example.paintrackerfree.util.DateUtils
+import com.example.paintrackerfree.util.PdfExporter
 import com.example.paintrackerfree.util.ReminderScheduler
 import com.example.paintrackerfree.util.ReminderStore
 import com.example.paintrackerfree.util.ThemeStore
@@ -33,6 +40,11 @@ import com.example.paintrackerfree.util.applyStatusBarPadding
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.Calendar
 import java.util.Locale
 
 class SettingsFragment : Fragment() {
@@ -45,6 +57,36 @@ class SettingsFragment : Fragment() {
     }
 
     private var billingClient: BillingClient? = null
+
+    private val importLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri ?: return@registerForActivityResult
+        CoroutineScope(Dispatchers.IO).launch {
+            when (val result = CsvImporter.parseCsv(requireContext(), uri)) {
+                is CsvImporter.Result.Failure -> showToast(getString(R.string.import_failed, result.message))
+                is CsvImporter.Result.Success -> {
+                    if (result.entries.isEmpty()) {
+                        showToast(getString(R.string.import_nothing))
+                        return@launch
+                    }
+                    val repo = (requireActivity().application as PainTrackerApp).repository
+                    val existingTimestamps = result.entries
+                        .filter { repo.existsByTimestamp(it.timestamp) }
+                        .map { it.timestamp }
+                        .toHashSet()
+                    val toInsert = result.entries.filter { it.timestamp !in existingTimestamps }
+                    if (toInsert.isNotEmpty()) repo.insertAll(toInsert)
+                    val duplicates = existingTimestamps.size
+                    val inserted = toInsert.size
+                    val totalSkipped = result.skipped + duplicates
+                    val msg = if (totalSkipped > 0)
+                        getString(R.string.import_success_skipped, inserted, totalSkipped)
+                    else
+                        getString(R.string.import_success, inserted)
+                    showToast(msg)
+                }
+            }
+        }
+    }
 
     // Product IDs — these must match what you create in the Google Play Console
     @Suppress("PrivatePropertyName", "PrivatePropertyName", "PrivatePropertyName")
@@ -66,8 +108,12 @@ class SettingsFragment : Fragment() {
         setupThemeSelector()
         setupReminders()
         setupCustomOptions()
+        setupImportExport()
         setupDeleteAll()
         setupBilling()
+
+        // Keep allEntries warm so .value is non-null when the export dialog reads it.
+        viewModel.allEntries.observe(viewLifecycleOwner) {}
     }
 
     // --- Theme ---
@@ -252,6 +298,140 @@ class SettingsFragment : Fragment() {
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
+    }
+
+    // --- Import & Export ---
+
+    private fun setupImportExport() {
+        binding.btnImport.setOnClickListener {
+            importLauncher.launch(arrayOf("text/csv", "text/comma-separated-values", "*/*"))
+        }
+
+        binding.btnExport.setOnClickListener {
+            showExportRangeDialog()
+        }
+    }
+
+    private fun showExportRangeDialog() {
+        val rangeOptions = arrayOf(
+            getString(R.string.export_range_all),
+            getString(R.string.export_range_30),
+            getString(R.string.export_range_90),
+            getString(R.string.export_range_custom)
+        )
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.export_range_title)
+            .setItems(rangeOptions) { _, which ->
+                when (which) {
+                    0 -> exportWithEntries { viewModel.allEntries.value ?: emptyList() }
+                    1 -> exportWithEntries {
+                        (viewModel.allEntries.value ?: emptyList())
+                            .filter { it.timestamp >= DateUtils.daysAgoMs(30) }
+                    }
+                    2 -> exportWithEntries {
+                        (viewModel.allEntries.value ?: emptyList())
+                            .filter { it.timestamp >= DateUtils.daysAgoMs(90) }
+                    }
+                    3 -> showCustomRangePicker()
+                }
+            }
+            .show()
+    }
+
+    private fun showCustomRangePicker() {
+        val now = Calendar.getInstance()
+        DatePickerDialog(
+            requireContext(),
+            { _, startYear, startMonth, startDay ->
+                val startCal = Calendar.getInstance().apply {
+                    set(startYear, startMonth, startDay, 0, 0, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }
+                DatePickerDialog(
+                    requireContext(),
+                    { _, endYear, endMonth, endDay ->
+                        val endCal = Calendar.getInstance().apply {
+                            set(endYear, endMonth, endDay, 23, 59, 59)
+                            set(Calendar.MILLISECOND, 999)
+                        }
+                        val startMs = startCal.timeInMillis
+                        val endMs = endCal.timeInMillis
+                        exportWithEntries {
+                            (viewModel.allEntries.value ?: emptyList())
+                                .filter { it.timestamp in startMs..endMs }
+                        }
+                    },
+                    now.get(Calendar.YEAR),
+                    now.get(Calendar.MONTH),
+                    now.get(Calendar.DAY_OF_MONTH)
+                ).apply {
+                    setTitle(getString(R.string.export_date_end))
+                    datePicker.minDate = startCal.timeInMillis
+                }.show()
+            },
+            now.get(Calendar.YEAR),
+            now.get(Calendar.MONTH),
+            now.get(Calendar.DAY_OF_MONTH)
+        ).apply {
+            setTitle(getString(R.string.export_date_start))
+        }.show()
+    }
+
+    private fun exportWithEntries(getEntries: () -> List<com.example.paintrackerfree.data.model.PainEntry>) {
+        val entries = getEntries()
+        if (entries.isEmpty()) {
+            Toast.makeText(requireContext(), R.string.export_range_empty, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val options = arrayOf(
+            getString(R.string.export_save_downloads_csv),
+            getString(R.string.export_share_csv),
+            getString(R.string.export_save_downloads_pdf),
+            getString(R.string.export_share_pdf)
+        )
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.export_choose_title)
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> CoroutineScope(Dispatchers.IO).launch {
+                        val name = CsvExporter.saveToDownloads(requireContext(), entries)
+                        showSaveResult(name)
+                    }
+                    1 -> CoroutineScope(Dispatchers.IO).launch {
+                        val intent = CsvExporter.buildShareIntent(requireContext(), entries)
+                        withContext(Dispatchers.Main) {
+                            startActivity(android.content.Intent.createChooser(intent, getString(R.string.export_title)))
+                        }
+                    }
+                    2 -> CoroutineScope(Dispatchers.IO).launch {
+                        val name = PdfExporter.saveToDownloads(requireContext(), entries)
+                        showSaveResult(name)
+                    }
+                    3 -> CoroutineScope(Dispatchers.IO).launch {
+                        val intent = PdfExporter.buildShareIntent(requireContext(), entries)
+                        withContext(Dispatchers.Main) {
+                            startActivity(android.content.Intent.createChooser(intent, getString(R.string.export_title)))
+                        }
+                    }
+                }
+            }
+            .show()
+    }
+
+    private suspend fun showToast(message: String) {
+        withContext(Dispatchers.Main) {
+            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private suspend fun showSaveResult(fileName: String?) {
+        val message = if (fileName != null)
+            getString(R.string.export_saved_downloads, fileName)
+        else
+            getString(R.string.export_save_failed)
+        showToast(message)
     }
 
     // --- Delete all ---

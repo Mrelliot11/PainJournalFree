@@ -296,16 +296,19 @@ object PdfExporter {
         canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, dividerPaint)
         y += 18f
 
-        // --- Three trend sections ---
-        listOf(7, 30, 90).forEach { days ->
-            val cutoff = DateUtils.daysAgoMs(days)
-            val slice = allSorted.filter { it.timestamp >= cutoff }
-            drawTrendSection("LAST $days DAYS", slice)
+        // --- Trend section for the exported entries ---
+        val trendLabel = if (allSorted.isNotEmpty()) {
+            val from = DateUtils.formatChartDateYear(allSorted.first().timestamp)
+            val to = DateUtils.formatChartDateYear(now)
+            "PAIN TREND  $from – $to"
+        } else {
+            "PAIN TREND"
         }
+        drawTrendSection(trendLabel, allSorted)
 
         // --- Entries list ---
         newPage()
-        canvas.drawText("ALL ENTRIES", MARGIN, y + sectionPaint.textSize, sectionPaint)
+        canvas.drawText("ENTRIES", MARGIN, y + sectionPaint.textSize, sectionPaint)
         y += sectionPaint.textSize + 10f
 
         // --- Entries ---
