@@ -16,6 +16,12 @@ class HomeViewModel(private val repository: PainRepository) : ViewModel() {
         viewModelScope.launch { repository.delete(entry) }
     }
 
+    fun quickLog(painLevel: Int) {
+        viewModelScope.launch {
+            repository.insert(PainEntry(painLevel = painLevel))
+        }
+    }
+
     fun restoreLastDeleted() {
         lastDeleted?.let { entry ->
             viewModelScope.launch { repository.insert(entry) }
