@@ -16,6 +16,7 @@ class PainRepository(private val dao: PainEntryDao) {
     suspend fun hasEntryToday(startOfDay: Long, endOfDay: Long): Boolean =
         dao.countEntriesForDay(startOfDay, endOfDay) > 0
     suspend fun insert(entry: PainEntry): Long = dao.insert(entry)
+    suspend fun insertAll(entries: List<PainEntry>) = dao.insertAll(entries)
     suspend fun update(entry: PainEntry) = dao.update(entry)
     suspend fun delete(entry: PainEntry) = dao.delete(entry)
     suspend fun deleteAll() = dao.deleteAll()

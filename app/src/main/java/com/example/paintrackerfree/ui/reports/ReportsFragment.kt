@@ -40,16 +40,16 @@ class ReportsFragment : Fragment() {
                         return@runInBackground
                     }
                     val repo = (requireActivity().application as PainTrackerApp).repository
-                    var inserted = 0
-                    var duplicates = 0
-                    result.entries.forEach { entry ->
-                        if (repo.existsByTimestamp(entry.timestamp)) {
-                            duplicates++
-                        } else {
-                            repo.insert(entry)
-                            inserted++
-                        }
-                    }
+                    // Deduplicate in memory, then insert in one transaction so Room
+                    // emits a single Flow update and all LiveData observers refresh together.
+                    val existingTimestamps = result.entries
+                        .filter { repo.existsByTimestamp(it.timestamp) }
+                        .map { it.timestamp }
+                        .toHashSet()
+                    val toInsert = result.entries.filter { it.timestamp !in existingTimestamps }
+                    if (toInsert.isNotEmpty()) repo.insertAll(toInsert)
+                    val duplicates = existingTimestamps.size
+                    val inserted = toInsert.size
                     val totalSkipped = result.skipped + duplicates
                     val msg = if (totalSkipped > 0)
                         getString(R.string.import_success_skipped, inserted, totalSkipped)
@@ -109,12 +109,12 @@ class ReportsFragment : Fragment() {
         }
 
         viewModel.triggerInsights.observe(viewLifecycleOwner) { categories ->
+            binding.llInsightsCategories.removeAllViews()
             if (categories.isEmpty()) {
                 binding.cardInsights.visibility = View.GONE
                 return@observe
             }
             binding.cardInsights.visibility = View.VISIBLE
-            binding.llInsightsCategories.removeAllViews()
             categories.forEachIndexed { index, category ->
                 if (index > 0) addDivider()
                 addCategorySection(category)
