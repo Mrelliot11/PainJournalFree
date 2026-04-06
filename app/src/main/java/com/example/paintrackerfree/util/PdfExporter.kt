@@ -298,8 +298,8 @@ object PdfExporter {
 
         // --- Trend section for the exported entries ---
         val trendLabel = if (allSorted.isNotEmpty()) {
-            val from = DateUtils.formatChartDate(allSorted.first().timestamp)
-            val to = DateUtils.formatChartDate(now)
+            val from = DateUtils.formatChartDateYear(allSorted.first().timestamp)
+            val to = DateUtils.formatChartDateYear(now)
             "PAIN TREND  $from – $to"
         } else {
             "PAIN TREND"
