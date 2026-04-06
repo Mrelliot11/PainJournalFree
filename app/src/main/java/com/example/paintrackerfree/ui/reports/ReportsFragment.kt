@@ -16,6 +16,7 @@ import com.example.paintrackerfree.util.CsvExporter
 import com.example.paintrackerfree.util.CsvImporter
 import com.example.paintrackerfree.util.PdfExporter
 import com.example.paintrackerfree.util.ViewModelFactory
+import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.*
 
@@ -80,8 +81,16 @@ class ReportsFragment : Fragment() {
         }
         binding.btn30days.isChecked = true
 
-        viewModel.entries.observe(viewLifecycleOwner) { entries ->
+        viewModel.filteredEntries.observe(viewLifecycleOwner) { entries ->
             binding.chart.entries = entries
+        }
+
+        viewModel.availablePainTypes.observe(viewLifecycleOwner) { types ->
+            rebuildPainTypeChips(types)
+        }
+
+        viewModel.availableLocations.observe(viewLifecycleOwner) { locations ->
+            rebuildLocationChips(locations)
         }
 
         viewModel.stats.observe(viewLifecycleOwner) { stats ->
@@ -117,7 +126,7 @@ class ReportsFragment : Fragment() {
         }
 
         binding.btnExport.setOnClickListener {
-            val entries = viewModel.entries.value ?: return@setOnClickListener
+            val entries = viewModel.filteredEntries.value ?: return@setOnClickListener
             if (entries.isEmpty()) return@setOnClickListener
 
             val options = arrayOf(
@@ -155,6 +164,64 @@ class ReportsFragment : Fragment() {
                 }
                 .show()
         }
+    }
+
+    private fun rebuildPainTypeChips(types: List<String>) {
+        binding.chipGroupPainType.removeAllViews()
+
+        // "All" chip
+        val allChip = Chip(requireContext()).apply {
+            text = getString(R.string.filter_all)
+            isCheckable = true
+            isChecked = viewModel.selectedPainType.value == null
+        }
+        allChip.setOnClickListener {
+            viewModel.selectedPainType.value = null
+        }
+        binding.chipGroupPainType.addView(allChip)
+
+        types.forEach { type ->
+            val chip = Chip(requireContext()).apply {
+                text = type
+                isCheckable = true
+                isChecked = viewModel.selectedPainType.value == type
+            }
+            chip.setOnClickListener {
+                viewModel.selectedPainType.value = type
+            }
+            binding.chipGroupPainType.addView(chip)
+        }
+
+        // Show/hide the filter row depending on whether there are any types to filter
+        binding.painTypeFilterRow.visibility = if (types.isEmpty()) View.GONE else View.VISIBLE
+    }
+
+    private fun rebuildLocationChips(locations: List<String>) {
+        binding.chipGroupLocation.removeAllViews()
+
+        val allChip = Chip(requireContext()).apply {
+            text = getString(R.string.filter_all)
+            isCheckable = true
+            isChecked = viewModel.selectedLocation.value == null
+        }
+        allChip.setOnClickListener {
+            viewModel.selectedLocation.value = null
+        }
+        binding.chipGroupLocation.addView(allChip)
+
+        locations.forEach { location ->
+            val chip = Chip(requireContext()).apply {
+                text = location
+                isCheckable = true
+                isChecked = viewModel.selectedLocation.value == location
+            }
+            chip.setOnClickListener {
+                viewModel.selectedLocation.value = location
+            }
+            binding.chipGroupLocation.addView(chip)
+        }
+
+        binding.locationFilterRow.visibility = if (locations.isEmpty()) View.GONE else View.VISIBLE
     }
 
     private fun runInBackground(block: suspend CoroutineScope.() -> Unit) {

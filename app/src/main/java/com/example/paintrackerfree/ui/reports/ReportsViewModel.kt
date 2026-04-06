@@ -1,6 +1,7 @@
 package com.example.paintrackerfree.ui.reports
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -28,11 +29,49 @@ class ReportsViewModel(private val repository: PainRepository) : ViewModel() {
 
     val selectedDays = MutableLiveData(30)
 
+    /** All entries in the selected date range, unfiltered. */
     val entries: LiveData<List<PainEntry>> = selectedDays.switchMap { days ->
         repository.getEntriesInRange(DateUtils.daysAgoMs(days), System.currentTimeMillis()).asLiveData()
     }
 
-    val stats: LiveData<ReportStats?> = entries.map { list ->
+    /** Sorted, distinct pain types present in the current date range. Empty strings excluded. */
+    val availablePainTypes: LiveData<List<String>> = entries.map { list ->
+        list.flatMap { it.painTypes.split(",").map(String::trim).filter(String::isNotBlank) }
+            .distinct()
+            .sorted()
+    }
+
+    /** Sorted, distinct locations present in the current date range. Empty strings excluded. */
+    val availableLocations: LiveData<List<String>> = entries.map { list ->
+        list.flatMap { it.locations.split(",").map(String::trim).filter(String::isNotBlank) }
+            .distinct()
+            .sorted()
+    }
+
+    /** The pain type chip the user has selected, or null for "All". */
+    val selectedPainType = MutableLiveData<String?>(null)
+
+    /** The location chip the user has selected, or null for "All". */
+    val selectedLocation = MutableLiveData<String?>(null)
+
+    /** Entries filtered by selectedPainType and selectedLocation — used for chart, stats, and insights. */
+    val filteredEntries: LiveData<List<PainEntry>> = MediatorLiveData<List<PainEntry>>().apply {
+        fun recompute() {
+            val list = entries.value ?: emptyList()
+            val type = selectedPainType.value
+            val location = selectedLocation.value
+            value = list.filter { entry ->
+                val typeMatch = type == null || entry.painTypes.split(",").map(String::trim).any { it.equals(type, ignoreCase = true) }
+                val locationMatch = location == null || entry.locations.split(",").map(String::trim).any { it.equals(location, ignoreCase = true) }
+                typeMatch && locationMatch
+            }
+        }
+        addSource(entries) { recompute() }
+        addSource(selectedPainType) { recompute() }
+        addSource(selectedLocation) { recompute() }
+    }
+
+    val stats: LiveData<ReportStats?> = filteredEntries.map { list ->
         if (list.isEmpty()) return@map null
         ReportStats(
             avgPain = list.map { it.painLevel }.average().toFloat(),
@@ -44,7 +83,7 @@ class ReportsViewModel(private val repository: PainRepository) : ViewModel() {
         )
     }
 
-    val triggerInsights: LiveData<List<InsightCategory>> = entries.map { list ->
+    val triggerInsights: LiveData<List<InsightCategory>> = filteredEntries.map { list ->
         val highPain = list.filter { it.painLevel >= 7 }
         if (highPain.isEmpty()) return@map emptyList()
 
