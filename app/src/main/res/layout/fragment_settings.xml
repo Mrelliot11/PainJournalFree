@@ -375,6 +375,37 @@
 
                         </RadioGroup>
 
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/divider"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginBottom="12dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/settings_auto_backup_folder"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:id="@+id/tv_backup_folder"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/settings_auto_backup_folder_default"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_primary"
+                            android:layout_marginBottom="8dp" />
+
+                        <Button
+                            android:id="@+id/btn_choose_backup_folder"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/settings_auto_backup_choose_folder" />
+
                     </LinearLayout>
 
                 </LinearLayout>

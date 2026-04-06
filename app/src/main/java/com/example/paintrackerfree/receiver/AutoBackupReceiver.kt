@@ -3,7 +3,10 @@ package com.example.paintrackerfree.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import androidx.documentfile.provider.DocumentFile
 import com.example.paintrackerfree.PainTrackerApp
+import com.example.paintrackerfree.util.AutoBackupStore
 import com.example.paintrackerfree.util.CsvExporter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,9 +23,25 @@ class AutoBackupReceiver : BroadcastReceiver() {
                     .repository
                     .getAllEntries()
                     .first()
-                if (entries.isNotEmpty()) {
-                    CsvExporter.saveToDownloads(context, entries)
+                if (entries.isEmpty()) return@launch
+
+                val folderUriString = AutoBackupStore.getFolderUri(context)
+                if (folderUriString != null) {
+                    val folderUri = Uri.parse(folderUriString)
+                    val folder = DocumentFile.fromTreeUri(context, folderUri)
+                    if (folder != null && folder.canWrite()) {
+                        val fileName = "pain_journal_${System.currentTimeMillis()}.csv"
+                        val file = folder.createFile("text/csv", fileName)
+                        file?.let {
+                            context.contentResolver.openOutputStream(it.uri)?.use { stream ->
+                                stream.write(CsvExporter.buildCsvBytes(entries))
+                            }
+                        }
+                        return@launch
+                    }
                 }
+                // Fall back to Downloads if no folder set or folder inaccessible
+                CsvExporter.saveToDownloads(context, entries)
             } finally {
                 result.finish()
             }

@@ -113,6 +113,9 @@
     <string name="settings_auto_backup_daily">Daily</string>
     <string name="settings_auto_backup_weekly">Weekly</string>
     <string name="settings_auto_backup_monthly">Monthly</string>
+    <string name="settings_auto_backup_folder">Backup folder</string>
+    <string name="settings_auto_backup_folder_default">Downloads (default)</string>
+    <string name="settings_auto_backup_choose_folder">Choose folder…</string>
     <string name="settings_import_export">Import &amp; Export</string>
     <string name="settings_import_export_description">Export your pain journal as CSV or PDF. Import from a previously exported CSV to restore or merge entries.</string>
     <string name="export_range_title">Export range</string>

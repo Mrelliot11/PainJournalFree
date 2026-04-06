@@ -60,6 +60,16 @@ class SettingsFragment : Fragment() {
 
     private var billingClient: BillingClient? = null
 
+    private val backupFolderLauncher = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
+        if (uri == null) return@registerForActivityResult
+        requireContext().contentResolver.takePersistableUriPermission(
+            uri,
+            android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION or android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+        )
+        AutoBackupStore.setFolderUri(requireContext(), uri.toString())
+        refreshBackupFolderLabel()
+    }
+
     private val importLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri ?: return@registerForActivityResult
         CoroutineScope(Dispatchers.IO).launch {
@@ -336,6 +346,22 @@ class SettingsFragment : Fragment() {
                 AutoBackupScheduler.cancel(requireContext())
                 AutoBackupScheduler.schedule(requireContext())
             }
+        }
+
+        refreshBackupFolderLabel()
+        binding.btnChooseBackupFolder.setOnClickListener {
+            backupFolderLauncher.launch(null)
+        }
+    }
+
+    private fun refreshBackupFolderLabel() {
+        val uriString = AutoBackupStore.getFolderUri(requireContext())
+        binding.tvBackupFolder.text = if (uriString != null) {
+            val uri = android.net.Uri.parse(uriString)
+            androidx.documentfile.provider.DocumentFile.fromTreeUri(requireContext(), uri)
+                ?.name ?: uriString
+        } else {
+            getString(R.string.settings_auto_backup_folder_default)
         }
     }
 

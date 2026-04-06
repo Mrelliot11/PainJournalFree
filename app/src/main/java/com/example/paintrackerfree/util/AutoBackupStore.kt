@@ -25,6 +25,12 @@ object AutoBackupStore {
     fun setFrequency(context: Context, frequency: String) =
         prefs(context).edit { putString(KEY_FREQUENCY, frequency) }
 
+    fun getFolderUri(context: Context): String? =
+        prefs(context).getString("folder_uri", null)
+
+    fun setFolderUri(context: Context, uri: String?) =
+        prefs(context).edit { putString("folder_uri", uri) }
+
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 }

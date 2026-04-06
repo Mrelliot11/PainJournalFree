@@ -64,6 +64,8 @@ object CsvExporter {
         return file
     }
 
+    fun buildCsvBytes(entries: List<PainEntry>): ByteArray = buildCsvContent(entries).toByteArray()
+
     private fun buildCsvContent(entries: List<PainEntry>): String {
         val sb = StringBuilder()
         sb.appendLine("Date/Time,Pain Level,Locations,Pain Types,Triggers,Medications,Mood (1-5),Sleep Quality (1-5),Notes")
