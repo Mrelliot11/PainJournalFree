@@ -45,7 +45,7 @@
             android:layout_marginBottom="8dp"
             app:boxBackgroundColor="@color/white"
             app:boxStrokeColor="@color/white"
-            app:hintTextColor="@color/text_secondary"
+            app:hintEnabled="false"
             app:startIconDrawable="@drawable/ic_search"
             app:startIconTint="@color/text_secondary"
             app:endIconMode="clear_text">
@@ -55,11 +55,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/history_search_hint"
+                android:textColorHint="@color/text_secondary"
                 android:inputType="text"
                 android:imeOptions="actionSearch"
-                android:textSize="13sp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp" />
+                android:textSize="14sp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
