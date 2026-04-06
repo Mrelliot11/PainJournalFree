@@ -14,6 +14,7 @@ import com.example.paintrackerfree.R
 import com.example.paintrackerfree.databinding.FragmentHomeBinding
 import com.example.paintrackerfree.ui.history.HistoryAdapter
 import com.example.paintrackerfree.ui.history.HistoryItem
+import com.example.paintrackerfree.util.BehaviourStore
 import com.example.paintrackerfree.util.ViewModelFactory
 import com.example.paintrackerfree.util.applyStatusBarPadding
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -117,6 +118,7 @@ class HomeFragment : Fragment() {
             override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, t: RecyclerView.ViewHolder) = false
 
             override fun getSwipeDirs(rv: RecyclerView, vh: RecyclerView.ViewHolder): Int {
+                if (!BehaviourStore.isSwipeToDeleteEnabled(requireContext())) return 0
                 val pos = vh.bindingAdapterPosition
                 return if (pos != RecyclerView.NO_POSITION && adapter.getEntryAt(pos) != null)
                     super.getSwipeDirs(rv, vh) else 0
