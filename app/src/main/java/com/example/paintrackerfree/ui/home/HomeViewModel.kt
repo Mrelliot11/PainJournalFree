@@ -5,8 +5,23 @@ import com.example.paintrackerfree.data.model.PainEntry
 import com.example.paintrackerfree.data.repository.PainRepository
 import com.example.paintrackerfree.util.DateUtils
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
-class HomeViewModel(repository: PainRepository) : ViewModel() {
+class HomeViewModel(private val repository: PainRepository) : ViewModel() {
+
+    var lastDeleted: PainEntry? = null
+
+    fun deleteEntry(entry: PainEntry) {
+        lastDeleted = entry
+        viewModelScope.launch { repository.delete(entry) }
+    }
+
+    fun restoreLastDeleted() {
+        lastDeleted?.let { entry ->
+            viewModelScope.launch { repository.insert(entry) }
+            lastDeleted = null
+        }
+    }
 
     val recentEntries: LiveData<List<PainEntry>> = repository.getRecentEntries().asLiveData()
 
