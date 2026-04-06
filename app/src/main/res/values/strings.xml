@@ -125,7 +125,7 @@
     <string name="settings_no_custom">None added yet</string>
     <string name="settings_auto_backup">Auto-Backup</string>
     <string name="settings_auto_backup_enable">Automatically back up to Downloads</string>
-    <string name="settings_auto_backup_description">Silently saves a CSV of all entries to your Downloads folder on the chosen schedule.</string>
+    <string name="settings_auto_backup_description">Saves a CSV of all entries to your Downloads folder on the chosen schedule.</string>
     <string name="settings_auto_backup_frequency">Frequency</string>
     <string name="settings_auto_backup_daily">Daily</string>
     <string name="settings_auto_backup_weekly">Weekly</string>
