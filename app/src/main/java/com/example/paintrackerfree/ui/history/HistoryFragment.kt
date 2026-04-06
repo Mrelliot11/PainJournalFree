@@ -60,12 +60,14 @@ class HistoryFragment : Fragment() {
 
             override fun getSwipeDirs(rv: RecyclerView, vh: RecyclerView.ViewHolder): Int {
                 val pos = vh.adapterPosition
-                return if (pos.toLong() != RecyclerView.NO_ID && adapter.getEntryAt(pos) != null)
+                return if (pos != RecyclerView.NO_POSITION && adapter.getEntryAt(pos) != null)
                     super.getSwipeDirs(rv, vh) else 0
             }
 
             override fun onSwiped(vh: RecyclerView.ViewHolder, dir: Int) {
-                val entry = adapter.getEntryAt(vh.adapterPosition) ?: return
+                val pos = vh.adapterPosition
+                val entry = if (pos != RecyclerView.NO_POSITION) adapter.getEntryAt(pos) else null
+                entry ?: return
                 viewModel.deleteEntry(entry)
                 Snackbar.make(binding.root, R.string.entry_deleted, Snackbar.LENGTH_LONG)
                     .setAction(R.string.undo) { viewModel.restoreLastDeleted() }
