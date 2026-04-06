@@ -75,6 +75,38 @@
 
             </com.google.android.material.button.MaterialButtonToggleGroup>
 
+            <!-- Pain type filter -->
+            <LinearLayout
+                android:id="@+id/pain_type_filter_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dp"
+                    android:text="@string/filter_by_pain_type"
+                    android:textSize="13sp"
+                    android:textColor="@color/text_secondary" />
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chip_group_pain_type"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:singleSelection="true"
+                        app:selectionRequired="true" />
+
+                </HorizontalScrollView>
+            </LinearLayout>
+
             <!-- Chart card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
