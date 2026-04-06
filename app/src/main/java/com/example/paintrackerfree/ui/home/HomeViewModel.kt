@@ -9,6 +9,9 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel(private val repository: PainRepository) : ViewModel() {
 
+    /** Set to true to trigger the quick-log bottom sheet; reset to false after consuming. */
+    val openQuickLogSheet = MutableLiveData(false)
+
     var lastDeleted: PainEntry? = null
 
     fun deleteEntry(entry: PainEntry) {

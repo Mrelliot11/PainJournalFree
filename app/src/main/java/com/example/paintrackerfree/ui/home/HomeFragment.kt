@@ -79,6 +79,13 @@ class HomeFragment : Fragment() {
         }
 
         setupSwipeToDelete(adapter)
+
+        viewModel.openQuickLogSheet.observe(viewLifecycleOwner) { open ->
+            if (open) {
+                viewModel.openQuickLogSheet.value = false
+                showQuickLogSheet()
+            }
+        }
     }
 
     private fun showQuickLogSheet() {

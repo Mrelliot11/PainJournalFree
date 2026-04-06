@@ -5,19 +5,18 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
-import com.example.paintrackerfree.data.model.PainEntry
 import com.example.paintrackerfree.databinding.ActivityMainBinding
-import kotlinx.coroutines.launch
+import com.example.paintrackerfree.ui.home.HomeViewModel
+import com.example.paintrackerfree.util.ViewModelFactory
 
 class MainActivity : AppCompatActivity() {
 
@@ -73,10 +72,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleQuickLog() {
         val repo = (application as PainTrackerApp).repository
-        lifecycleScope.launch {
-            repo.insert(PainEntry(painLevel = 5))
-        }
-        Toast.makeText(this, getString(R.string.quick_log_saved, 5), Toast.LENGTH_SHORT).show()
+        val homeVm = ViewModelProvider(this, ViewModelFactory(repo))[HomeViewModel::class.java]
+        homeVm.openQuickLogSheet.value = true
     }
 
     fun requestNotificationPermissionIfNeeded() {
