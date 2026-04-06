@@ -51,6 +51,10 @@ class HistoryFragment : Fragment() {
             binding.tvEmpty.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
         }
 
+        viewModel.entryCount.observe(viewLifecycleOwner) { count ->
+            binding.toolbar.subtitle = resources.getQuantityString(R.plurals.entry_count, count, count)
+        }
+
         binding.fabAdd.setOnClickListener {
             findNavController().navigate(R.id.action_history_to_logEntry)
         }
@@ -147,13 +151,13 @@ class HistoryFragment : Fragment() {
             override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, t: RecyclerView.ViewHolder) = false
 
             override fun getSwipeDirs(rv: RecyclerView, vh: RecyclerView.ViewHolder): Int {
-                val pos = vh.adapterPosition
+                val pos = vh.bindingAdapterPosition
                 return if (pos != RecyclerView.NO_POSITION && adapter.getEntryAt(pos) != null)
                     super.getSwipeDirs(rv, vh) else 0
             }
 
             override fun onSwiped(vh: RecyclerView.ViewHolder, dir: Int) {
-                val pos = vh.adapterPosition
+                val pos = vh.bindingAdapterPosition
                 val entry = if (pos != RecyclerView.NO_POSITION) adapter.getEntryAt(pos) else null
                 entry ?: return
                 viewModel.deleteEntry(entry)

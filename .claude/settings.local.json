@@ -8,7 +8,11 @@
       "Bash(gh repo:*)",
       "Bash(gh label:*)",
       "Bash(gh issue:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(gh pr:*)",
+      "Bash(git push:*)"
     ]
   },
   "prefersReducedMotion": false

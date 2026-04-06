@@ -117,13 +117,13 @@ class HomeFragment : Fragment() {
             override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, t: RecyclerView.ViewHolder) = false
 
             override fun getSwipeDirs(rv: RecyclerView, vh: RecyclerView.ViewHolder): Int {
-                val pos = vh.adapterPosition
+                val pos = vh.bindingAdapterPosition
                 return if (pos != RecyclerView.NO_POSITION && adapter.getEntryAt(pos) != null)
                     super.getSwipeDirs(rv, vh) else 0
             }
 
             override fun onSwiped(vh: RecyclerView.ViewHolder, dir: Int) {
-                val pos = vh.adapterPosition
+                val pos = vh.bindingAdapterPosition
                 val entry = if (pos != RecyclerView.NO_POSITION) adapter.getEntryAt(pos) else null
                 entry ?: return
                 viewModel.deleteEntry(entry)

@@ -79,6 +79,11 @@ class HistoryViewModel(private val repository: PainRepository) : ViewModel() {
         addSource(triggerFilter) { recompute() }
     }
 
+    /** Count of entry rows currently visible (after filters applied). */
+    val entryCount: LiveData<Int> = historyItems.map { items ->
+        items.count { it is HistoryItem.Entry }
+    }
+
     fun deleteEntry(entry: PainEntry) {
         lastDeleted = entry
         viewModelScope.launch { repository.delete(entry) }
