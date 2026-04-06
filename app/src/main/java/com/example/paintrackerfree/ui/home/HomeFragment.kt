@@ -5,7 +5,9 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.paintrackerfree.PainTrackerApp
 import com.example.paintrackerfree.R
 import com.example.paintrackerfree.databinding.FragmentHomeBinding
@@ -13,6 +15,7 @@ import com.example.paintrackerfree.ui.history.HistoryAdapter
 import com.example.paintrackerfree.ui.history.HistoryItem
 import com.example.paintrackerfree.util.ViewModelFactory
 import com.example.paintrackerfree.util.applyStatusBarPadding
+import com.google.android.material.snackbar.Snackbar
 
 class HomeFragment : Fragment() {
 
@@ -66,6 +69,31 @@ class HomeFragment : Fragment() {
         binding.fabLogPain.setOnClickListener {
             findNavController().navigate(R.id.action_home_to_logEntry)
         }
+
+        setupSwipeToDelete(adapter)
+    }
+
+    private fun setupSwipeToDelete(adapter: HistoryAdapter) {
+        val swipeCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, t: RecyclerView.ViewHolder) = false
+
+            override fun getSwipeDirs(rv: RecyclerView, vh: RecyclerView.ViewHolder): Int {
+                val pos = vh.adapterPosition
+                return if (pos != RecyclerView.NO_POSITION && adapter.getEntryAt(pos) != null)
+                    super.getSwipeDirs(rv, vh) else 0
+            }
+
+            override fun onSwiped(vh: RecyclerView.ViewHolder, dir: Int) {
+                val pos = vh.adapterPosition
+                val entry = if (pos != RecyclerView.NO_POSITION) adapter.getEntryAt(pos) else null
+                entry ?: return
+                viewModel.deleteEntry(entry)
+                Snackbar.make(binding.root, R.string.entry_deleted, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.undo) { viewModel.restoreLastDeleted() }
+                    .show()
+            }
+        }
+        ItemTouchHelper(swipeCallback).attachToRecyclerView(binding.rvRecentEntries)
     }
 
     override fun onDestroyView() {

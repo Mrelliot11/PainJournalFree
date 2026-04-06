@@ -39,7 +39,7 @@ class HistoryViewModel(private val repository: PainRepository) : ViewModel() {
 
     fun restoreLastDeleted() {
         lastDeleted?.let { entry ->
-            viewModelScope.launch { repository.insert(entry.copy(id = 0)) }
+            viewModelScope.launch { repository.insert(entry) }
             lastDeleted = null
         }
     }
