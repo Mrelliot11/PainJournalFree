@@ -52,6 +52,10 @@ class HistoryFragment : Fragment() {
             binding.tvEmpty.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
         }
 
+        viewModel.entryCount.observe(viewLifecycleOwner) { count ->
+            binding.toolbar.subtitle = resources.getQuantityString(R.plurals.entry_count, count, count)
+        }
+
         binding.fabAdd.setOnClickListener {
             findNavController().navigate(R.id.action_history_to_logEntry)
         }
