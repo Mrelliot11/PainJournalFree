@@ -10,6 +10,10 @@
     <string name="history">History</string>
     <string name="reports">Reports</string>
     <string name="log_pain">Log Pain</string>
+    <string name="quick_log">Quick Log</string>
+    <string name="quick_log_title">Quick Log Pain Level</string>
+    <string name="quick_log_save">Save</string>
+    <string name="quick_log_saved">Pain level %d logged</string>
     <string name="edit_entry">Edit Entry</string>
 
     <!-- Home -->

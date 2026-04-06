@@ -5,15 +5,19 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.example.paintrackerfree.data.model.PainEntry
 import com.example.paintrackerfree.databinding.ActivityMainBinding
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -53,7 +57,26 @@ class MainActivity : AppCompatActivity() {
             navController.navigate(R.id.action_home_to_logEntry)
         }
 
+        if (intent.action == ACTION_QUICK_LOG) {
+            handleQuickLog()
+        }
+
         requestNotificationPermissionIfNeeded()
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        if (intent.action == ACTION_QUICK_LOG) {
+            handleQuickLog()
+        }
+    }
+
+    private fun handleQuickLog() {
+        val repo = (application as PainTrackerApp).repository
+        lifecycleScope.launch {
+            repo.insert(PainEntry(painLevel = 5))
+        }
+        Toast.makeText(this, getString(R.string.quick_log_saved, 5), Toast.LENGTH_SHORT).show()
     }
 
     fun requestNotificationPermissionIfNeeded() {
@@ -68,5 +91,6 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_OPEN_LOG_ENTRY = "open_log_entry"
+        const val ACTION_QUICK_LOG = "com.example.paintrackerfree.QUICK_LOG"
     }
 }

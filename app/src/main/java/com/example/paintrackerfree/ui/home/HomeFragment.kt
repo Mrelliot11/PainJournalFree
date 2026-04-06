@@ -2,6 +2,7 @@ package com.example.paintrackerfree.ui.home
 
 import android.os.Bundle
 import android.view.*
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -15,6 +16,9 @@ import com.example.paintrackerfree.ui.history.HistoryAdapter
 import com.example.paintrackerfree.ui.history.HistoryItem
 import com.example.paintrackerfree.util.ViewModelFactory
 import com.example.paintrackerfree.util.applyStatusBarPadding
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.slider.Slider
 import com.google.android.material.snackbar.Snackbar
 
 class HomeFragment : Fragment() {
@@ -70,7 +74,35 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_home_to_logEntry)
         }
 
+        binding.fabQuickLog.setOnClickListener {
+            showQuickLogSheet()
+        }
+
         setupSwipeToDelete(adapter)
+    }
+
+    private fun showQuickLogSheet() {
+        val sheet = BottomSheetDialog(requireContext())
+        val sheetView = layoutInflater.inflate(R.layout.sheet_quick_log, null)
+        sheet.setContentView(sheetView)
+
+        val slider = sheetView.findViewById<Slider>(R.id.slider_quick_log)
+        val tvLevel = sheetView.findViewById<TextView>(R.id.tv_quick_log_level)
+        val btnSave = sheetView.findViewById<MaterialButton>(R.id.btn_quick_log_save)
+
+        tvLevel.text = slider.value.toInt().toString()
+        slider.addOnChangeListener { _, value, _ ->
+            tvLevel.text = value.toInt().toString()
+        }
+
+        btnSave.setOnClickListener {
+            val level = slider.value.toInt()
+            viewModel.quickLog(level)
+            sheet.dismiss()
+            Snackbar.make(binding.root, getString(R.string.quick_log_saved, level), Snackbar.LENGTH_SHORT).show()
+        }
+
+        sheet.show()
     }
 
     private fun setupSwipeToDelete(adapter: HistoryAdapter) {
