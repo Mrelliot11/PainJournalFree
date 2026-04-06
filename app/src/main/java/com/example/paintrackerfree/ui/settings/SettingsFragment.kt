@@ -27,6 +27,8 @@ import com.example.paintrackerfree.MainActivity
 import com.example.paintrackerfree.PainTrackerApp
 import com.example.paintrackerfree.R
 import com.example.paintrackerfree.databinding.FragmentSettingsBinding
+import com.example.paintrackerfree.util.AutoBackupScheduler
+import com.example.paintrackerfree.util.AutoBackupStore
 import com.example.paintrackerfree.util.CsvExporter
 import com.example.paintrackerfree.util.CsvImporter
 import com.example.paintrackerfree.util.CustomOptionsStore
@@ -108,6 +110,7 @@ class SettingsFragment : Fragment() {
         setupThemeSelector()
         setupReminders()
         setupCustomOptions()
+        setupAutoBackup()
         setupImportExport()
         setupDeleteAll()
         setupBilling()
@@ -298,6 +301,42 @@ class SettingsFragment : Fragment() {
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
+    }
+
+    // --- Auto-Backup ---
+
+    private fun setupAutoBackup() {
+        val enabled = AutoBackupStore.isEnabled(requireContext())
+        binding.switchAutoBackup.isChecked = enabled
+        binding.llAutoBackupFrequency.visibility = if (enabled) View.VISIBLE else View.GONE
+
+        binding.rgBackupFrequency.check(
+            when (AutoBackupStore.getFrequency(requireContext())) {
+                AutoBackupStore.FREQUENCY_DAILY -> R.id.rb_backup_daily
+                AutoBackupStore.FREQUENCY_MONTHLY -> R.id.rb_backup_monthly
+                else -> R.id.rb_backup_weekly
+            }
+        )
+
+        binding.switchAutoBackup.setOnCheckedChangeListener { _, isChecked ->
+            AutoBackupStore.setEnabled(requireContext(), isChecked)
+            binding.llAutoBackupFrequency.visibility = if (isChecked) View.VISIBLE else View.GONE
+            if (isChecked) AutoBackupScheduler.schedule(requireContext())
+            else AutoBackupScheduler.cancel(requireContext())
+        }
+
+        binding.rgBackupFrequency.setOnCheckedChangeListener { _, checkedId ->
+            val frequency = when (checkedId) {
+                R.id.rb_backup_daily -> AutoBackupStore.FREQUENCY_DAILY
+                R.id.rb_backup_monthly -> AutoBackupStore.FREQUENCY_MONTHLY
+                else -> AutoBackupStore.FREQUENCY_WEEKLY
+            }
+            AutoBackupStore.setFrequency(requireContext(), frequency)
+            if (AutoBackupStore.isEnabled(requireContext())) {
+                AutoBackupScheduler.cancel(requireContext())
+                AutoBackupScheduler.schedule(requireContext())
+            }
+        }
     }
 
     // --- Import & Export ---
