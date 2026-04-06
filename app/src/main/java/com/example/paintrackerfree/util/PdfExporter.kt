@@ -297,7 +297,14 @@ object PdfExporter {
         y += 18f
 
         // --- Trend section for the exported entries ---
-        drawTrendSection("PAIN TREND", allSorted)
+        val trendLabel = if (allSorted.isNotEmpty()) {
+            val from = DateUtils.formatChartDate(allSorted.first().timestamp)
+            val to = DateUtils.formatChartDate(now)
+            "PAIN TREND  $from – $to"
+        } else {
+            "PAIN TREND"
+        }
+        drawTrendSection(trendLabel, allSorted)
 
         // --- Entries list ---
         newPage()
