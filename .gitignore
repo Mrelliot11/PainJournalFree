@@ -29,3 +29,6 @@ local.properties
 
 # Test data
 /test_import.csv
+/app/src/test/java/com/example/paintrackerfree/util/DateUtilsTest.kt
+/app/src/test/java/com/example/paintrackerfree/data/model/PainEntryTest.kt
+/TODO.md
