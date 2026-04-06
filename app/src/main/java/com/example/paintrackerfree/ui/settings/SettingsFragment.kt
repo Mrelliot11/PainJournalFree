@@ -111,6 +111,9 @@ class SettingsFragment : Fragment() {
         setupImportExport()
         setupDeleteAll()
         setupBilling()
+
+        // Keep allEntries warm so .value is non-null when the export dialog reads it.
+        viewModel.allEntries.observe(viewLifecycleOwner) {}
     }
 
     // --- Theme ---
