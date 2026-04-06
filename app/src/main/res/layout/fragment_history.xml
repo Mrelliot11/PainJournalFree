@@ -38,7 +38,7 @@
         <!-- Search bar -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/til_search"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="12dp"
@@ -57,7 +57,9 @@
                 android:hint="@string/history_search_hint"
                 android:inputType="text"
                 android:imeOptions="actionSearch"
-                android:textSize="14sp" />
+                android:textSize="13sp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
