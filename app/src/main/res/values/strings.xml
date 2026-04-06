@@ -102,6 +102,9 @@
     <string name="nav_settings">Settings</string>
     <string name="settings">Settings</string>
     <string name="settings_appearance">Appearance</string>
+    <string name="settings_behaviour">Behaviour</string>
+    <string name="settings_swipe_to_delete">Swipe to delete</string>
+    <string name="settings_swipe_to_delete_desc">Swipe left or right on an entry to delete it</string>
     <string name="settings_reminders">Reminders</string>
     <string name="settings_reminders_description">Get a daily notification to log your pain level at times you choose.</string>
     <string name="settings_add_reminder">Add reminder time</string>

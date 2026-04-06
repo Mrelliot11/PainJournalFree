@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.paintrackerfree.PainTrackerApp
 import com.example.paintrackerfree.R
 import com.example.paintrackerfree.databinding.FragmentHistoryBinding
+import com.example.paintrackerfree.util.BehaviourStore
 import com.example.paintrackerfree.util.ViewModelFactory
 import com.example.paintrackerfree.util.applyStatusBarPadding
 import com.google.android.material.chip.Chip
@@ -147,13 +148,14 @@ class HistoryFragment : Fragment() {
             override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, t: RecyclerView.ViewHolder) = false
 
             override fun getSwipeDirs(rv: RecyclerView, vh: RecyclerView.ViewHolder): Int {
-                val pos = vh.adapterPosition
+                if (!BehaviourStore.isSwipeToDeleteEnabled(requireContext())) return 0
+                val pos = vh.bindingAdapterPosition
                 return if (pos != RecyclerView.NO_POSITION && adapter.getEntryAt(pos) != null)
                     super.getSwipeDirs(rv, vh) else 0
             }
 
             override fun onSwiped(vh: RecyclerView.ViewHolder, dir: Int) {
-                val pos = vh.adapterPosition
+                val pos = vh.bindingAdapterPosition
                 val entry = if (pos != RecyclerView.NO_POSITION) adapter.getEntryAt(pos) else null
                 entry ?: return
                 viewModel.deleteEntry(entry)

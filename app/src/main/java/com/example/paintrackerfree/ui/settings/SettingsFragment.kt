@@ -34,6 +34,7 @@ import com.example.paintrackerfree.util.CsvImporter
 import com.example.paintrackerfree.util.CustomOptionsStore
 import com.example.paintrackerfree.util.DateUtils
 import com.example.paintrackerfree.util.PdfExporter
+import com.example.paintrackerfree.util.BehaviourStore
 import com.example.paintrackerfree.util.ReminderScheduler
 import com.example.paintrackerfree.util.ReminderStore
 import com.example.paintrackerfree.util.ThemeStore
@@ -118,6 +119,7 @@ class SettingsFragment : Fragment() {
         binding.appBar.applyStatusBarPadding()
 
         setupThemeSelector()
+        setupBehaviourToggles()
         setupReminders()
         setupCustomOptions()
         setupAutoBackup()
@@ -147,6 +149,15 @@ class SettingsFragment : Fragment() {
                 else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
             }
             ThemeStore.setMode(requireContext(), mode)
+        }
+    }
+
+    // --- Behaviour ---
+
+    private fun setupBehaviourToggles() {
+        binding.switchSwipeToDelete.isChecked = BehaviourStore.isSwipeToDeleteEnabled(requireContext())
+        binding.switchSwipeToDelete.setOnCheckedChangeListener { _, checked ->
+            BehaviourStore.setSwipeToDeleteEnabled(requireContext(), checked)
         }
     }
 
