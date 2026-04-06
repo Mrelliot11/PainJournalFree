@@ -1,6 +1,8 @@
 package com.example.paintrackerfree.ui.history
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +17,8 @@ import com.example.paintrackerfree.R
 import com.example.paintrackerfree.databinding.FragmentHistoryBinding
 import com.example.paintrackerfree.util.ViewModelFactory
 import com.example.paintrackerfree.util.applyStatusBarPadding
+import com.google.android.material.chip.Chip
+import com.google.android.material.slider.RangeSlider
 import com.google.android.material.snackbar.Snackbar
 
 class HistoryFragment : Fragment() {
@@ -51,7 +55,87 @@ class HistoryFragment : Fragment() {
             findNavController().navigate(R.id.action_history_to_logEntry)
         }
 
+        setupSearch()
+        setupFilterPanel()
         setupSwipeToDelete(adapter)
+    }
+
+    private fun setupSearch() {
+        binding.etSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                viewModel.searchQuery.value = s?.toString() ?: ""
+            }
+        })
+    }
+
+    private fun setupFilterPanel() {
+        binding.btnFilterToggle.setOnClickListener {
+            val visible = binding.llFilters.visibility == View.VISIBLE
+            binding.llFilters.visibility = if (visible) View.GONE else View.VISIBLE
+        }
+
+        // Pain range slider
+        updatePainRangeLabel(0, 10)
+        binding.sliderPain.addOnChangeListener(RangeSlider.OnChangeListener { slider, _, _ ->
+            val min = slider.values[0].toInt()
+            val max = slider.values[1].toInt()
+            viewModel.minPain.value = min
+            viewModel.maxPain.value = max
+            updatePainRangeLabel(min, max)
+        })
+
+        // Location chips
+        viewModel.availableLocations.observe(viewLifecycleOwner) { locations ->
+            rebuildFilterChips(
+                group = binding.chipGroupLocationFilter,
+                items = locations,
+                currentSelection = viewModel.locationFilter.value,
+                onSelect = { viewModel.locationFilter.value = it }
+            )
+        }
+
+        // Trigger chips
+        viewModel.availableTriggers.observe(viewLifecycleOwner) { triggers ->
+            rebuildFilterChips(
+                group = binding.chipGroupTriggerFilter,
+                items = triggers,
+                currentSelection = viewModel.triggerFilter.value,
+                onSelect = { viewModel.triggerFilter.value = it }
+            )
+        }
+
+        binding.btnClearFilters.setOnClickListener {
+            viewModel.clearFilters()
+            binding.etSearch.setText("")
+            binding.sliderPain.values = listOf(0f, 10f)
+            updatePainRangeLabel(0, 10)
+        }
+    }
+
+    private fun updatePainRangeLabel(min: Int, max: Int) {
+        binding.tvPainRangeLabel.text = getString(R.string.history_pain_range_label, min, max)
+    }
+
+    private fun rebuildFilterChips(
+        group: com.google.android.material.chip.ChipGroup,
+        items: List<String>,
+        currentSelection: String?,
+        onSelect: (String?) -> Unit
+    ) {
+        group.removeAllViews()
+        items.forEach { item ->
+            val chip = Chip(requireContext()).apply {
+                text = item
+                isCheckable = true
+                isChecked = item == currentSelection
+                setOnCheckedChangeListener { _, checked ->
+                    if (checked) onSelect(item) else onSelect(null)
+                }
+            }
+            group.addView(chip)
+        }
     }
 
     private fun setupSwipeToDelete(adapter: HistoryAdapter) {
@@ -73,7 +157,6 @@ class HistoryFragment : Fragment() {
                     .setAction(R.string.undo) { viewModel.restoreLastDeleted() }
                     .show()
             }
-
         }
         ItemTouchHelper(swipeCallback).attachToRecyclerView(binding.rvHistory)
     }

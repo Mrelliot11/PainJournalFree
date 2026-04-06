@@ -20,7 +20,145 @@
             android:background="@color/blue_primary"
             app:title="@string/history"
             app:titleTextAppearance="@style/ToolbarTitle"
-            app:titleTextColor="@color/white" />
+            app:titleTextColor="@color/white">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_filter_toggle"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:text="@string/history_filter"
+                android:textColor="@color/white"
+                app:iconTint="@color/white"
+                app:icon="@drawable/ic_filter" />
+
+        </com.google.android.material.appbar.MaterialToolbar>
+
+        <!-- Search bar -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_search"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginBottom="8dp"
+            app:boxBackgroundColor="@color/white"
+            app:boxStrokeColor="@color/white"
+            app:hintTextColor="@color/text_secondary"
+            app:startIconDrawable="@drawable/ic_search"
+            app:startIconTint="@color/text_secondary"
+            app:endIconMode="clear_text">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/history_search_hint"
+                android:inputType="text"
+                android:imeOptions="actionSearch"
+                android:textSize="14sp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Collapsible filter panel -->
+        <LinearLayout
+            android:id="@+id/ll_filters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="12dp"
+            android:paddingBottom="12dp"
+            android:background="@color/blue_primary"
+            android:visibility="gone">
+
+            <!-- Pain level range -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/history_filter_pain"
+                android:textSize="12sp"
+                android:textColor="@color/white"
+                android:layout_marginBottom="2dp" />
+
+            <TextView
+                android:id="@+id/tv_pain_range_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="@color/white"
+                android:layout_marginBottom="4dp" />
+
+            <com.google.android.material.slider.RangeSlider
+                android:id="@+id/slider_pain"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:valueFrom="0"
+                android:valueTo="10"
+                android:stepSize="1"
+                app:values="@array/pain_slider_defaults"
+                app:thumbColor="@color/white"
+                app:trackColorActive="@color/white"
+                app:trackColorInactive="#66FFFFFF"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Location filter chips -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filter_by_location"
+                android:textSize="12sp"
+                android:textColor="@color/white"
+                android:layout_marginBottom="4dp" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:layout_marginBottom="12dp">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group_location_filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:singleSelection="true"
+                    app:selectionRequired="false" />
+
+            </HorizontalScrollView>
+
+            <!-- Trigger filter chips -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filter_by_trigger"
+                android:textSize="12sp"
+                android:textColor="@color/white"
+                android:layout_marginBottom="4dp" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:layout_marginBottom="4dp">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group_trigger_filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:singleSelection="true"
+                    app:selectionRequired="false" />
+
+            </HorizontalScrollView>
+
+            <Button
+                android:id="@+id/btn_clear_filters"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/history_clear_filters"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
 
