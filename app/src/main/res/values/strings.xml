@@ -106,6 +106,16 @@
     <string name="settings_custom_pain_types">Custom Pain Types</string>
     <string name="settings_custom_triggers">Custom Triggers</string>
     <string name="settings_no_custom">None added yet</string>
+    <string name="settings_auto_backup">Auto-Backup</string>
+    <string name="settings_auto_backup_enable">Automatically back up to Downloads</string>
+    <string name="settings_auto_backup_description">Silently saves a CSV of all entries to your Downloads folder on the chosen schedule.</string>
+    <string name="settings_auto_backup_frequency">Frequency</string>
+    <string name="settings_auto_backup_daily">Daily</string>
+    <string name="settings_auto_backup_weekly">Weekly</string>
+    <string name="settings_auto_backup_monthly">Monthly</string>
+    <string name="settings_auto_backup_folder">Backup folder</string>
+    <string name="settings_auto_backup_folder_default">Downloads (default)</string>
+    <string name="settings_auto_backup_choose_folder">Choose folder…</string>
     <string name="settings_import_export">Import &amp; Export</string>
     <string name="settings_import_export_description">Export your pain journal as CSV or PDF. Import from a previously exported CSV to restore or merge entries.</string>
     <string name="export_range_title">Export range</string>

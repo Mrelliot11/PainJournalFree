@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.navigation.ui.ktx)
     implementation(libs.billing)
     implementation(libs.preference.ktx)
+    implementation(libs.documentfile)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
