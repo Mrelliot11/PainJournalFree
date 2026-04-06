@@ -89,6 +89,10 @@ class ReportsFragment : Fragment() {
             rebuildPainTypeChips(types)
         }
 
+        viewModel.availableLocations.observe(viewLifecycleOwner) { locations ->
+            rebuildLocationChips(locations)
+        }
+
         viewModel.stats.observe(viewLifecycleOwner) { stats ->
             if (stats == null) {
                 binding.cardStats.visibility = View.GONE
@@ -190,6 +194,34 @@ class ReportsFragment : Fragment() {
 
         // Show/hide the filter row depending on whether there are any types to filter
         binding.painTypeFilterRow.visibility = if (types.isEmpty()) View.GONE else View.VISIBLE
+    }
+
+    private fun rebuildLocationChips(locations: List<String>) {
+        binding.chipGroupLocation.removeAllViews()
+
+        val allChip = Chip(requireContext()).apply {
+            text = getString(R.string.filter_all)
+            isCheckable = true
+            isChecked = viewModel.selectedLocation.value == null
+        }
+        allChip.setOnClickListener {
+            viewModel.selectedLocation.value = null
+        }
+        binding.chipGroupLocation.addView(allChip)
+
+        locations.forEach { location ->
+            val chip = Chip(requireContext()).apply {
+                text = location
+                isCheckable = true
+                isChecked = viewModel.selectedLocation.value == location
+            }
+            chip.setOnClickListener {
+                viewModel.selectedLocation.value = location
+            }
+            binding.chipGroupLocation.addView(chip)
+        }
+
+        binding.locationFilterRow.visibility = if (locations.isEmpty()) View.GONE else View.VISIBLE
     }
 
     private fun runInBackground(block: suspend CoroutineScope.() -> Unit) {

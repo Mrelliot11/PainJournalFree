@@ -41,21 +41,34 @@ class ReportsViewModel(private val repository: PainRepository) : ViewModel() {
             .sorted()
     }
 
+    /** Sorted, distinct locations present in the current date range. Empty strings excluded. */
+    val availableLocations: LiveData<List<String>> = entries.map { list ->
+        list.flatMap { it.locations.split(",").map(String::trim).filter(String::isNotBlank) }
+            .distinct()
+            .sorted()
+    }
+
     /** The pain type chip the user has selected, or null for "All". */
     val selectedPainType = MutableLiveData<String?>(null)
 
-    /** Entries filtered by selectedPainType — used for chart, stats, and insights. */
+    /** The location chip the user has selected, or null for "All". */
+    val selectedLocation = MutableLiveData<String?>(null)
+
+    /** Entries filtered by selectedPainType and selectedLocation — used for chart, stats, and insights. */
     val filteredEntries: LiveData<List<PainEntry>> = MediatorLiveData<List<PainEntry>>().apply {
         fun recompute() {
             val list = entries.value ?: emptyList()
             val type = selectedPainType.value
-            value = if (type == null) list
-            else list.filter { entry ->
-                entry.painTypes.split(",").map(String::trim).any { it.equals(type, ignoreCase = true) }
+            val location = selectedLocation.value
+            value = list.filter { entry ->
+                val typeMatch = type == null || entry.painTypes.split(",").map(String::trim).any { it.equals(type, ignoreCase = true) }
+                val locationMatch = location == null || entry.locations.split(",").map(String::trim).any { it.equals(location, ignoreCase = true) }
+                typeMatch && locationMatch
             }
         }
         addSource(entries) { recompute() }
         addSource(selectedPainType) { recompute() }
+        addSource(selectedLocation) { recompute() }
     }
 
     val stats: LiveData<ReportStats?> = filteredEntries.map { list ->

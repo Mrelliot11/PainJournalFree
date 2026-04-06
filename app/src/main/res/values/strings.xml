@@ -65,6 +65,7 @@
     <string name="stat_top_location">Most Affected: %s</string>
     <string name="stat_top_trigger">Top Trigger: %s</string>
     <string name="filter_by_pain_type">Filter by pain type</string>
+    <string name="filter_by_location">Filter by location</string>
     <string name="filter_all">All</string>
     <string name="insights_title">Trigger Insights</string>
     <string name="insights_subtitle">Factors most often logged on high pain days (pain ≥ 7)</string>
