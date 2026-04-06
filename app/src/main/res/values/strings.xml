@@ -21,6 +21,10 @@
     <string name="no_entries_yet">No entries yet today</string>
     <string name="recent_entries">Recent Entries</string>
     <string name="no_entries_logged">No pain entries logged yet.\nTap + to add your first entry.</string>
+    <plurals name="entry_count">
+        <item quantity="one">%d entry</item>
+        <item quantity="other">%d entries</item>
+    </plurals>
     <plurals name="today_entries">
         <item quantity="one">%d entry today</item>
         <item quantity="other">%d entries today</item>

@@ -20,7 +20,8 @@
             android:background="@color/blue_primary"
             app:title="@string/history"
             app:titleTextAppearance="@style/ToolbarTitle"
-            app:titleTextColor="@color/white">
+            app:titleTextColor="@color/white"
+            app:subtitleTextColor="@color/white">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_filter_toggle"
