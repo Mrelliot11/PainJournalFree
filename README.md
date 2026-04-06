@@ -25,7 +25,7 @@ All data stays on your device. No accounts, no ads, no internet connection requi
 - Swipe left or right to delete with one-tap undo
 
 ### Reports & Insights
-- Pain trend chart for the last 7, 30, or 90 days (custom-drawn — no third-party chart library)
+- Pain trend chart for custom time periods (custom-drawn — no third-party chart library)
 - Summary stats: entry count, average pain, min/max range, most common location and trigger
 - High-pain analysis (entries rated 7+): common triggers, locations, types, medications, mood and sleep distributions
 - Export to **CSV** or a styled **PDF** (includes charts + full entry list)
@@ -37,6 +37,7 @@ All data stays on your device. No accounts, no ads, no internet connection requi
 
 ### Customization
 - Add your own body locations, pain types, and triggers
+- Swipe to delete custom options with one-tap undo
 - Choose Light, Dark, or System default theme
 
 ---
@@ -75,4 +76,4 @@ All data stays on your device. No accounts, no ads, no internet connection requi
 
 ## License
 
-[MIT](LICENSE)
+This project is licensed under the Apache 2.0 License — see the [LICENSE](LICENSE.MD) file for details.

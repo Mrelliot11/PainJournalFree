@@ -1,20 +1,31 @@
+# Built outputs
 *.iml
+/build
+/app/build
+/captures
+*.apk
+*.aab
+
+# Gradle
 .gradle
-/local.properties
+.externalNativeBuild
+.cxx
+
+# IDE
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+
+# Local config (machine-specific)
 local.properties
-TODO.md
-settings.gradle.kts
-.gitignore
-*Test.kt
+.DS_Store
+
+# Signing keys (never commit)
+*.jks
+*.keystore
+
+# Test data
 /test_import.csv
