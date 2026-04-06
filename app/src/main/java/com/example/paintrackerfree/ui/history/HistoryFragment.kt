@@ -86,25 +86,29 @@ class HistoryFragment : Fragment() {
             updatePainRangeLabel(min, max)
         })
 
-        // Location chips
-        viewModel.availableLocations.observe(viewLifecycleOwner) { locations ->
+        // Location chips — rebuild when available locations OR current selection changes
+        val rebuildLocations = {
             rebuildFilterChips(
                 group = binding.chipGroupLocationFilter,
-                items = locations,
+                items = viewModel.availableLocations.value ?: emptyList(),
                 currentSelection = viewModel.locationFilter.value,
                 onSelect = { viewModel.locationFilter.value = it }
             )
         }
+        viewModel.availableLocations.observe(viewLifecycleOwner) { rebuildLocations() }
+        viewModel.locationFilter.observe(viewLifecycleOwner) { rebuildLocations() }
 
-        // Trigger chips
-        viewModel.availableTriggers.observe(viewLifecycleOwner) { triggers ->
+        // Trigger chips — rebuild when available triggers OR current selection changes
+        val rebuildTriggers = {
             rebuildFilterChips(
                 group = binding.chipGroupTriggerFilter,
-                items = triggers,
+                items = viewModel.availableTriggers.value ?: emptyList(),
                 currentSelection = viewModel.triggerFilter.value,
                 onSelect = { viewModel.triggerFilter.value = it }
             )
         }
+        viewModel.availableTriggers.observe(viewLifecycleOwner) { rebuildTriggers() }
+        viewModel.triggerFilter.observe(viewLifecycleOwner) { rebuildTriggers() }
 
         binding.btnClearFilters.setOnClickListener {
             viewModel.clearFilters()
