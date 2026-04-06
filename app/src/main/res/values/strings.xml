@@ -66,7 +66,13 @@
     <string name="stat_top_trigger">Top Trigger: %s</string>
     <string name="filter_by_pain_type">Filter by pain type</string>
     <string name="filter_by_location">Filter by location</string>
+    <string name="filter_by_trigger">Filter by trigger</string>
     <string name="filter_all">All</string>
+    <string name="history_filter">Filter</string>
+    <string name="history_search_hint">Search notes, locations, triggers…</string>
+    <string name="history_filter_pain">Pain level range</string>
+    <string name="history_clear_filters">Clear filters</string>
+    <string name="history_pain_range_label">%1$d – %2$d</string>
     <string name="insights_title">Trigger Insights</string>
     <string name="insights_subtitle">Factors most often logged on high pain days (pain ≥ 7)</string>
     <plurals name="insights_count">
