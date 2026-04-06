@@ -10,6 +10,7 @@
 .gradle
 .externalNativeBuild
 .cxx
+.claude
 
 # IDE
 /.idea/caches
