@@ -35,7 +35,7 @@ object ReminderScheduler {
         )
 
         val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pi)
+        am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pi)
     }
 
     fun cancel(context: Context, hhmm: String) {
