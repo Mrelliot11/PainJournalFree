@@ -37,6 +37,13 @@ class LogEntryViewModel(private val repository: PainRepository) : ViewModel() {
         }
     }
 
+    fun loadDuplicate(id: Long) {
+        viewModelScope.launch {
+            val source = repository.getEntryById(id) ?: return@launch
+            _existingEntry.value = source.copy(id = 0L, timestamp = System.currentTimeMillis())
+        }
+    }
+
     fun saveEntry(
         entryId: Long,
         timestamp: Long,
