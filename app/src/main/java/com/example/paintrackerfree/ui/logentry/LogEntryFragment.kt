@@ -50,17 +50,26 @@ class LogEntryFragment : Fragment() {
         binding.appBar.applyStatusBarPadding()
 
         entryId = arguments?.getLong("entryId", 0L) ?: 0L
+        val duplicateFromId = arguments?.getLong("duplicateFromId", 0L) ?: 0L
 
         binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
 
-        if (entryId > 0L) {
-            binding.toolbar.title = getString(R.string.edit_entry)
-            binding.btnDelete.visibility = View.VISIBLE
-            viewModel.loadEntry(entryId)
-        } else {
-            binding.toolbar.title = getString(R.string.log_pain)
-            binding.btnDelete.visibility = View.GONE
-            viewModel.checkTodayEntry()
+        when {
+            entryId > 0L -> {
+                binding.toolbar.title = getString(R.string.edit_entry)
+                binding.btnDelete.visibility = View.VISIBLE
+                viewModel.loadEntry(entryId)
+            }
+            duplicateFromId > 0L -> {
+                binding.toolbar.title = getString(R.string.log_pain)
+                binding.btnDelete.visibility = View.GONE
+                viewModel.loadDuplicate(duplicateFromId)
+            }
+            else -> {
+                binding.toolbar.title = getString(R.string.log_pain)
+                binding.btnDelete.visibility = View.GONE
+                viewModel.checkTodayEntry()
+            }
         }
 
         setupChips()

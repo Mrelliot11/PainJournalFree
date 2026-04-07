@@ -40,6 +40,10 @@
             android:name="entryId"
             app:argType="long"
             android:defaultValue="0L" />
+        <argument
+            android:name="duplicateFromId"
+            app:argType="long"
+            android:defaultValue="0L" />
     </fragment>
 
 </navigation>
