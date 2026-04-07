@@ -50,26 +50,19 @@ class LogEntryFragment : Fragment() {
         binding.appBar.applyStatusBarPadding()
 
         entryId = arguments?.getLong("entryId", 0L) ?: 0L
-        val duplicateFromId = arguments?.getLong("duplicateFromId", 0L) ?: 0L
 
         binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
 
-        when {
-            entryId > 0L -> {
-                binding.toolbar.title = getString(R.string.edit_entry)
-                binding.btnDelete.visibility = View.VISIBLE
-                viewModel.loadEntry(entryId)
-            }
-            duplicateFromId > 0L -> {
-                binding.toolbar.title = getString(R.string.log_pain)
-                binding.btnDelete.visibility = View.GONE
-                viewModel.loadDuplicate(duplicateFromId)
-            }
-            else -> {
-                binding.toolbar.title = getString(R.string.log_pain)
-                binding.btnDelete.visibility = View.GONE
-                viewModel.checkTodayEntry()
-            }
+        if (entryId > 0L) {
+            binding.toolbar.title = getString(R.string.edit_entry)
+            binding.btnDelete.visibility = View.VISIBLE
+            // Hide until entry data arrives to prevent default→saved value jitter
+            binding.scrollContent.alpha = 0f
+            viewModel.loadEntry(entryId)
+        } else {
+            binding.toolbar.title = getString(R.string.log_pain)
+            binding.btnDelete.visibility = View.GONE
+            viewModel.checkTodayEntry()
         }
 
         setupChips()
@@ -97,6 +90,7 @@ class LogEntryFragment : Fragment() {
             binding.ratingMood.rating = entry.mood.toFloat()
             binding.ratingSleep.rating = entry.sleepQuality.toFloat()
             binding.etNotes.setText(entry.notes)
+            binding.scrollContent.animate().alpha(1f).setDuration(150).start()
         }
 
         viewModel.hasTodayEntry.observe(viewLifecycleOwner) { hasEntry ->
