@@ -21,7 +21,6 @@ import com.dubrow.paintrackerfree.util.ViewModelFactory
 import com.dubrow.paintrackerfree.util.applyStatusBarPadding
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.slider.RangeSlider
 import com.google.android.material.snackbar.Snackbar
 
 class HistoryFragment : Fragment() {
@@ -92,7 +91,7 @@ class HistoryFragment : Fragment() {
 
     private fun setupFilterPanel() {
         binding.btnFilterToggle.setOnClickListener {
-            val visible = binding.llFilters.visibility == View.VISIBLE
+            val visible = binding.llFilters.isVisible
             binding.llFilters.visibility = if (visible) View.GONE else View.VISIBLE
         }
 
