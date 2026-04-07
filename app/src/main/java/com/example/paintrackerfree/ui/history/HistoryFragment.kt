@@ -19,6 +19,7 @@ import com.example.paintrackerfree.util.BehaviourStore
 import com.example.paintrackerfree.util.ViewModelFactory
 import com.example.paintrackerfree.util.applyStatusBarPadding
 import com.google.android.material.chip.Chip
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.RangeSlider
 import com.google.android.material.snackbar.Snackbar
 
@@ -46,8 +47,15 @@ class HistoryFragment : Fragment() {
                     Bundle().apply { putLong("entryId", entry.id) })
             },
             onEntryLongClick = { entry ->
-                findNavController().navigate(R.id.action_history_to_logEntry,
-                    Bundle().apply { putLong("duplicateFromId", entry.id) })
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.duplicate_entry_title)
+                    .setMessage(R.string.duplicate_entry_message)
+                    .setPositiveButton(R.string.duplicate) { _, _ ->
+                        findNavController().navigate(R.id.action_history_to_logEntry,
+                            Bundle().apply { putLong("duplicateFromId", entry.id) })
+                    }
+                    .setNegativeButton(R.string.cancel, null)
+                    .show()
             }
         )
         binding.rvHistory.layoutManager = LinearLayoutManager(requireContext())
