@@ -20,9 +20,11 @@ import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
+import com.android.billingclient.api.queryProductDetails
 import com.example.paintrackerfree.MainActivity
 import com.example.paintrackerfree.PainTrackerApp
 import com.example.paintrackerfree.R
@@ -547,7 +549,7 @@ class SettingsFragment : Fragment() {
 
         billingClient = BillingClient.newBuilder(requireContext())
             .setListener(purchasesUpdatedListener)
-            .enablePendingPurchases()
+            .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
             .build()
 
         billingClient?.startConnection(object : BillingClientStateListener {
@@ -578,18 +580,19 @@ class SettingsFragment : Fragment() {
         )
         val params = QueryProductDetailsParams.newBuilder().setProductList(productList).build()
 
-        client.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
-            if (billingResult.responseCode != BillingClient.BillingResponseCode.OK
-                || productDetailsList.isEmpty()
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = client.queryProductDetails(params)
+            val productDetailsList = result.productDetailsList
+            if (result.billingResult.responseCode != BillingClient.BillingResponseCode.OK
+                || productDetailsList.isNullOrEmpty()
             ) {
-                activity?.runOnUiThread {
+                withContext(Dispatchers.Main) {
                     Snackbar.make(binding.root, R.string.settings_tip_unavailable, Snackbar.LENGTH_SHORT).show()
                 }
-                return@queryProductDetailsAsync
+                return@launch
             }
 
             val productDetails = productDetailsList[0]
-            val offerToken = productDetails.oneTimePurchaseOfferDetails?.zza() ?: ""
 
             val billingFlowParams = BillingFlowParams.newBuilder()
                 .setProductDetailsParamsList(
@@ -601,7 +604,7 @@ class SettingsFragment : Fragment() {
                 )
                 .build()
 
-            activity?.runOnUiThread {
+            withContext(Dispatchers.Main) {
                 activity?.let { client.launchBillingFlow(it, billingFlowParams) }
             }
         }
