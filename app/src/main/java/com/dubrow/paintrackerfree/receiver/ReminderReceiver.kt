@@ -1,12 +1,12 @@
 package com.dubrow.paintrackerfree.receiver
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.dubrow.paintrackerfree.MainActivity
 import com.dubrow.paintrackerfree.R
 import com.dubrow.paintrackerfree.util.ReminderScheduler
@@ -14,15 +14,14 @@ import com.dubrow.paintrackerfree.util.ReminderScheduler
 class ReminderReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val nmCompat = NotificationManagerCompat.from(context)
 
-        if (nm.getNotificationChannel(CHANNEL_ID) == null) {
-            nm.createNotificationChannel(
-                NotificationChannel(CHANNEL_ID, "Pain Reminders", NotificationManager.IMPORTANCE_DEFAULT).apply {
-                    description = "Daily reminders to log your pain level"
-                }
-            )
-        }
+        nmCompat.createNotificationChannel(
+            NotificationChannelCompat.Builder(CHANNEL_ID, NotificationManagerCompat.IMPORTANCE_DEFAULT)
+                .setName("Pain Reminders")
+                .setDescription("Daily reminders to log your pain level")
+                .build()
+        )
 
         val openIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -52,7 +51,7 @@ class ReminderReceiver : BroadcastReceiver() {
             .setAutoCancel(true)
             .build()
 
-        nm.notify(notifId, notification)
+        nmCompat.notify(notifId, notification)
     }
 
     companion object {

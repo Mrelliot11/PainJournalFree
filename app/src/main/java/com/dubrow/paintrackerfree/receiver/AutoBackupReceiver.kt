@@ -3,7 +3,7 @@ package com.dubrow.paintrackerfree.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import com.dubrow.paintrackerfree.PainTrackerApp
 import com.dubrow.paintrackerfree.util.AutoBackupStore
@@ -27,7 +27,7 @@ class AutoBackupReceiver : BroadcastReceiver() {
 
                 val folderUriString = AutoBackupStore.getFolderUri(context)
                 if (folderUriString != null) {
-                    val folderUri = Uri.parse(folderUriString)
+                    val folderUri = folderUriString.toUri()
                     val folder = DocumentFile.fromTreeUri(context, folderUri)
                     if (folder != null && folder.canWrite()) {
                         val fileName = "pain_journal_${System.currentTimeMillis()}.csv"

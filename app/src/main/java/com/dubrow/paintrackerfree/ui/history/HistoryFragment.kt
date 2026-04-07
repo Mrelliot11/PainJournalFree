@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -63,7 +64,7 @@ class HistoryFragment : Fragment() {
 
         viewModel.historyItems.observe(viewLifecycleOwner) { items ->
             adapter.submitList(items)
-            binding.tvEmpty.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
+            binding.tvEmpty.isVisible = items.isEmpty()
         }
 
         viewModel.entryCount.observe(viewLifecycleOwner) { count ->
@@ -97,13 +98,13 @@ class HistoryFragment : Fragment() {
 
         // Pain range slider
         updatePainRangeLabel(0, 10)
-        binding.sliderPain.addOnChangeListener(RangeSlider.OnChangeListener { slider, _, _ ->
+        binding.sliderPain.addOnChangeListener { slider, _, _ ->
             val min = slider.values[0].toInt()
             val max = slider.values[1].toInt()
             viewModel.minPain.value = min
             viewModel.maxPain.value = max
             updatePainRangeLabel(min, max)
-        })
+        }
 
         // Location chips — rebuild when available locations OR current selection changes
         val rebuildLocations = {
