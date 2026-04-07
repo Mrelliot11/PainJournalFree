@@ -161,6 +161,7 @@
     <string name="settings_tip_thank_you">Thank you for your support! ♥</string>
     <string name="settings_tip_unavailable">Tips unavailable — please try again later</string>
     <string name="settings_tip_error">Purchase failed. Please try again.</string>
+    <string name="_defaultPain5">5</string>
 
     <!-- Chip arrays -->
     <string-array name="body_locations">

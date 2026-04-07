@@ -1,12 +1,15 @@
 package com.example.paintrackerfree.ui.reports
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
+import androidx.core.graphics.toColorInt
 import com.example.paintrackerfree.data.model.PainEntry
 import com.example.paintrackerfree.util.DateUtils
-import androidx.core.graphics.toColorInt
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -52,13 +55,13 @@ class PainChartView @JvmOverloads constructor(
     private val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
     private val labelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = "#757575".toColorInt()
-        textSize = resources.displayMetrics.scaledDensity * 13f
+        textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 13f, resources.displayMetrics)
     }
     private val linePath = Path()
 
     private val emptyPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = "#BDBDBD".toColorInt()
-        textSize = resources.displayMetrics.scaledDensity * 16f
+        textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 16f, resources.displayMetrics)
         textAlign = Paint.Align.CENTER
     }
 

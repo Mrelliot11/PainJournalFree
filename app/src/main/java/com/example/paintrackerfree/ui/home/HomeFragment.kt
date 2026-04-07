@@ -1,7 +1,9 @@
 package com.example.paintrackerfree.ui.home
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -91,7 +93,7 @@ class HomeFragment : Fragment() {
 
     private fun showQuickLogSheet() {
         val sheet = BottomSheetDialog(requireContext())
-        val sheetView = layoutInflater.inflate(R.layout.sheet_quick_log, null)
+        val sheetView = layoutInflater.inflate(R.layout.sheet_quick_log, sheet.window?.decorView as? ViewGroup, false)
         sheet.setContentView(sheetView)
 
         val slider = sheetView.findViewById<Slider>(R.id.slider_quick_log)

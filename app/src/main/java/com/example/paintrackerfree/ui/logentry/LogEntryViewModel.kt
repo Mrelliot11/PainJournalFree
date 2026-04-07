@@ -1,6 +1,9 @@
 package com.example.paintrackerfree.ui.logentry
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.paintrackerfree.data.model.PainEntry
 import com.example.paintrackerfree.data.repository.PainRepository
 import com.example.paintrackerfree.util.DateUtils
@@ -31,14 +34,6 @@ class LogEntryViewModel(private val repository: PainRepository) : ViewModel() {
     fun loadEntry(id: Long) {
         viewModelScope.launch {
             _existingEntry.value = repository.getEntryById(id)
-        }
-    }
-
-    fun loadDuplicate(id: Long) {
-        viewModelScope.launch {
-            val source = repository.getEntryById(id) ?: return@launch
-            // Copy all fields except id (0 = new) and timestamp (use now)
-            _existingEntry.value = source.copy(id = 0L, timestamp = System.currentTimeMillis())
         }
     }
 

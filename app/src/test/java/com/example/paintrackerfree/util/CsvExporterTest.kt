@@ -1,7 +1,8 @@
 package com.example.paintrackerfree.util
 
 import com.example.paintrackerfree.data.model.PainEntry
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CsvExporterTest {

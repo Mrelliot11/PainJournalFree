@@ -31,12 +31,12 @@ import com.example.paintrackerfree.R
 import com.example.paintrackerfree.databinding.FragmentSettingsBinding
 import com.example.paintrackerfree.util.AutoBackupScheduler
 import com.example.paintrackerfree.util.AutoBackupStore
+import com.example.paintrackerfree.util.BehaviourStore
 import com.example.paintrackerfree.util.CsvExporter
 import com.example.paintrackerfree.util.CsvImporter
 import com.example.paintrackerfree.util.CustomOptionsStore
 import com.example.paintrackerfree.util.DateUtils
 import com.example.paintrackerfree.util.PdfExporter
-import com.example.paintrackerfree.util.BehaviourStore
 import com.example.paintrackerfree.util.ReminderScheduler
 import com.example.paintrackerfree.util.ReminderStore
 import com.example.paintrackerfree.util.ThemeStore
@@ -51,6 +51,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Locale
+import androidx.core.net.toUri
 
 class SettingsFragment : Fragment() {
 
@@ -217,7 +218,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun showAddReminderPicker() {
-        val cal = java.util.Calendar.getInstance()
+        val cal = Calendar.getInstance()
         TimePickerDialog(
             requireContext(),
             { _, hour, minute ->
@@ -226,8 +227,8 @@ class SettingsFragment : Fragment() {
                 ReminderScheduler.schedule(requireContext(), hhmm)
                 refreshReminderList()
             },
-            cal.get(java.util.Calendar.HOUR_OF_DAY),
-            cal.get(java.util.Calendar.MINUTE),
+            cal.get(Calendar.HOUR_OF_DAY),
+            cal.get(Calendar.MINUTE),
             false
         ).show()
     }
@@ -370,7 +371,7 @@ class SettingsFragment : Fragment() {
     private fun refreshBackupFolderLabel() {
         val uriString = AutoBackupStore.getFolderUri(requireContext())
         binding.tvBackupFolder.text = if (uriString != null) {
-            val uri = android.net.Uri.parse(uriString)
+            val uri = uriString.toUri()
             androidx.documentfile.provider.DocumentFile.fromTreeUri(requireContext(), uri)
                 ?.name ?: uriString
         } else {

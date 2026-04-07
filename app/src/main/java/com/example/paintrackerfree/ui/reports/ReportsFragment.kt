@@ -1,7 +1,9 @@
 package com.example.paintrackerfree.ui.reports
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -9,8 +11,8 @@ import androidx.fragment.app.viewModels
 import com.example.paintrackerfree.PainTrackerApp
 import com.example.paintrackerfree.R
 import com.example.paintrackerfree.databinding.FragmentReportsBinding
-import com.example.paintrackerfree.util.applyStatusBarPadding
 import com.example.paintrackerfree.util.ViewModelFactory
+import com.example.paintrackerfree.util.applyStatusBarPadding
 import com.google.android.material.chip.Chip
 
 class ReportsFragment : Fragment() {
