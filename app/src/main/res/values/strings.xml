@@ -44,6 +44,9 @@
     <string name="save_entry">Save Entry</string>
     <string name="delete_entry">Delete Entry</string>
     <string name="entry_deleted">Entry deleted</string>
+    <string name="duplicate_entry_title">Duplicate entry?</string>
+    <string name="duplicate_entry_message">A new entry will be created with the same values and today\'s timestamp.</string>
+    <string name="duplicate">Duplicate</string>
     <string name="undo">Undo</string>
 
     <!-- Reports -->

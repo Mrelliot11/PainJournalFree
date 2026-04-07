@@ -12,6 +12,7 @@ import com.example.paintrackerfree.util.DateUtils
 
 class HistoryAdapter(
     private val onEntryClick: (PainEntry) -> Unit,
+    private val onEntryLongClick: ((PainEntry) -> Unit)? = null,
     private val showDate: Boolean = false
 ) :
     ListAdapter<HistoryItem, RecyclerView.ViewHolder>(DIFF) {
@@ -70,6 +71,9 @@ class HistoryAdapter(
             b.tvLocations.text = entry.locations.ifBlank { "No location" }
             b.tvNotePreview.text = entry.notes.ifBlank { "" }
             b.root.setOnClickListener { onEntryClick(entry) }
+            onEntryLongClick?.let { longClick ->
+                b.root.setOnLongClickListener { longClick(entry); true }
+            }
         }
 
         private fun painLevelColor(level: Int) = when {
