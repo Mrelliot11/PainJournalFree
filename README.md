@@ -44,8 +44,13 @@ All data stays on your device. No accounts, no ads, no internet connection requi
 
 ## Screenshots
 
-*Coming soon*
-
+![Home screen showing today's stats and recent entries](Screenshots/home.png)
+![Log entry form — pain level and body location](Screenshots/log_entry_top.png)
+![Log entry form — triggers, notes, mood and save](Screenshots/log_entry_bottom.png)
+![History screen with search and filters](Screenshots/history.png)
+![Reports screen with pain trend chart and summary stats](Screenshots/reports.png)
+![Settings — reminders and customization](Screenshots/settings_reminders.png)
+![Settings — auto-backup and import/export](Screenshots/settings_backup.png)
 ---
 
 ## Tech Stack
