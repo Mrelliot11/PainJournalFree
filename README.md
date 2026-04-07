@@ -44,13 +44,13 @@ All data stays on your device. No accounts, no ads, no internet connection requi
 
 ## Screenshots
 
-![Home screen showing today's stats and recent entries](Screenshots/home.png)
-![Log entry form — pain level and body location](Screenshots/log_entry_top.png)
-![Log entry form — triggers, notes, mood and save](Screenshots/log_entry_bottom.png)
-![History screen with search and filters](Screenshots/history.png)
-![Reports screen with pain trend chart and summary stats](Screenshots/reports.png)
-![Settings — reminders and customization](Screenshots/settings_reminders.png)
-![Settings — auto-backup and import/export](Screenshots/settings_backup.png)
+<img src="Screenshots/home.png" width="200" alt="Home screen showing today's stats and recent entries">
+<img src="Screenshots/log_entry_top.png" width="200" alt="Log entry form — pain level and body location">
+<img src="Screenshots/log_entry_bottom.png" width="200" alt="Log entry form — triggers, notes, mood and save">
+<img src="Screenshots/history.png" width="200" alt="History screen with search and filters">
+<img src="Screenshots/reports.png" width="200" alt="Reports screen with pain trend chart and summary stats">
+<img src="Screenshots/settings_reminders.png" width="200" alt="Settings — reminders and customization">
+<img src="Screenshots/settings_backup.png" width="200" alt="Settings — auto-backup and import/export">
 ---
 
 ## Tech Stack
