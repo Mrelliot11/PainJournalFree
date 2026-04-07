@@ -56,6 +56,8 @@ class LogEntryFragment : Fragment() {
         if (entryId > 0L) {
             binding.toolbar.title = getString(R.string.edit_entry)
             binding.btnDelete.visibility = View.VISIBLE
+            // Hide until entry data arrives to prevent default→saved value jitter
+            binding.scrollContent.alpha = 0f
             viewModel.loadEntry(entryId)
         } else {
             binding.toolbar.title = getString(R.string.log_pain)
@@ -88,6 +90,7 @@ class LogEntryFragment : Fragment() {
             binding.ratingMood.rating = entry.mood.toFloat()
             binding.ratingSleep.rating = entry.sleepQuality.toFloat()
             binding.etNotes.setText(entry.notes)
+            binding.scrollContent.animate().alpha(1f).setDuration(150).start()
         }
 
         viewModel.hasTodayEntry.observe(viewLifecycleOwner) { hasEntry ->
