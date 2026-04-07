@@ -165,7 +165,7 @@
                         android:textStyle="bold"
                         android:textColor="@color/text_primary" />
 
-                    <com.example.paintrackerfree.ui.reports.PainChartView
+                    <com.dubrow.paintrackerfree.ui.reports.PainChartView
                         android:id="@+id/chart"
                         android:layout_width="match_parent"
                         android:layout_height="220dp" />

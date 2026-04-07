@@ -1,0 +1,146 @@
+package com.dubrow.paintrackerfree.ui.home
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.dubrow.paintrackerfree.PainTrackerApp
+import com.dubrow.paintrackerfree.R
+import com.dubrow.paintrackerfree.databinding.FragmentHomeBinding
+import com.dubrow.paintrackerfree.ui.history.HistoryAdapter
+import com.dubrow.paintrackerfree.ui.history.HistoryItem
+import com.dubrow.paintrackerfree.util.BehaviourStore
+import com.dubrow.paintrackerfree.util.ViewModelFactory
+import com.dubrow.paintrackerfree.util.applyStatusBarPadding
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.slider.Slider
+import com.google.android.material.snackbar.Snackbar
+
+class HomeFragment : Fragment() {
+
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
+
+    private val viewModel: HomeViewModel by activityViewModels {
+        ViewModelFactory((requireActivity().application as PainTrackerApp).repository)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.appBar.applyStatusBarPadding()
+
+        val adapter = HistoryAdapter(
+            onEntryClick = { entry ->
+                findNavController().navigate(R.id.action_home_to_logEntry,
+                    Bundle().apply { putLong("entryId", entry.id) })
+            },
+            showDate = true
+        )
+        binding.rvRecentEntries.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvRecentEntries.adapter = adapter
+        binding.rvRecentEntries.isNestedScrollingEnabled = false
+
+        viewModel.recentEntries.observe(viewLifecycleOwner) { entries ->
+            adapter.submitList(entries.map { HistoryItem.Entry(it) })
+            binding.tvNoEntries.visibility = if (entries.isEmpty()) View.VISIBLE else View.GONE
+        }
+
+        viewModel.todayEntries.observe(viewLifecycleOwner) { entries ->
+            binding.tvTodayCount.text = resources.getQuantityString(
+                R.plurals.today_entries, entries.size, entries.size
+            )
+        }
+
+        viewModel.todayAvgPain.observe(viewLifecycleOwner) { avg ->
+            if (avg != null) {
+                binding.tvTodayAvg.text = getString(R.string.avg_pain_fmt, avg)
+                binding.tvTodayAvg.visibility = View.VISIBLE
+            } else {
+                binding.tvTodayAvg.visibility = View.INVISIBLE
+            }
+        }
+
+        binding.fabLogPain.setOnClickListener {
+            findNavController().navigate(R.id.action_home_to_logEntry)
+        }
+
+        binding.fabQuickLog.setOnClickListener {
+            showQuickLogSheet()
+        }
+
+        setupSwipeToDelete(adapter)
+
+        viewModel.openQuickLogSheet.observe(viewLifecycleOwner) { open ->
+            if (open) {
+                viewModel.openQuickLogSheet.value = false
+                showQuickLogSheet()
+            }
+        }
+    }
+
+    private fun showQuickLogSheet() {
+        val sheet = BottomSheetDialog(requireContext())
+        val sheetView = layoutInflater.inflate(R.layout.sheet_quick_log, sheet.window?.decorView as? ViewGroup, false)
+        sheet.setContentView(sheetView)
+
+        val slider = sheetView.findViewById<Slider>(R.id.slider_quick_log)
+        val tvLevel = sheetView.findViewById<TextView>(R.id.tv_quick_log_level)
+        val btnSave = sheetView.findViewById<MaterialButton>(R.id.btn_quick_log_save)
+
+        tvLevel.text = slider.value.toInt().toString()
+        slider.addOnChangeListener { _, value, _ ->
+            tvLevel.text = value.toInt().toString()
+        }
+
+        btnSave.setOnClickListener {
+            val level = slider.value.toInt()
+            viewModel.quickLog(level)
+            sheet.dismiss()
+            Snackbar.make(binding.root, getString(R.string.quick_log_saved, level), Snackbar.LENGTH_SHORT).show()
+        }
+
+        sheet.show()
+    }
+
+    private fun setupSwipeToDelete(adapter: HistoryAdapter) {
+        val swipeCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, t: RecyclerView.ViewHolder) = false
+
+            override fun getSwipeDirs(rv: RecyclerView, vh: RecyclerView.ViewHolder): Int {
+                if (!BehaviourStore.isSwipeToDeleteEnabled(requireContext())) return 0
+                val pos = vh.bindingAdapterPosition
+                return if (pos != RecyclerView.NO_POSITION && adapter.getEntryAt(pos) != null)
+                    super.getSwipeDirs(rv, vh) else 0
+            }
+
+            override fun onSwiped(vh: RecyclerView.ViewHolder, dir: Int) {
+                val pos = vh.bindingAdapterPosition
+                val entry = if (pos != RecyclerView.NO_POSITION) adapter.getEntryAt(pos) else null
+                entry ?: return
+                viewModel.deleteEntry(entry)
+                Snackbar.make(binding.root, R.string.entry_deleted, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.undo) { viewModel.restoreLastDeleted() }
+                    .show()
+            }
+        }
+        ItemTouchHelper(swipeCallback).attachToRecyclerView(binding.rvRecentEntries)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}

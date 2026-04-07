@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.example.paintrackerfree.ui.home.HomeFragment"
+        android:name="com.dubrow.paintrackerfree.ui.home.HomeFragment"
         android:label="Home">
         <action
             android:id="@+id/action_home_to_logEntry"
@@ -15,7 +15,7 @@
 
     <fragment
         android:id="@+id/historyFragment"
-        android:name="com.example.paintrackerfree.ui.history.HistoryFragment"
+        android:name="com.dubrow.paintrackerfree.ui.history.HistoryFragment"
         android:label="History">
         <action
             android:id="@+id/action_history_to_logEntry"
@@ -24,17 +24,17 @@
 
     <fragment
         android:id="@+id/reportsFragment"
-        android:name="com.example.paintrackerfree.ui.reports.ReportsFragment"
+        android:name="com.dubrow.paintrackerfree.ui.reports.ReportsFragment"
         android:label="Reports" />
 
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.example.paintrackerfree.ui.settings.SettingsFragment"
+        android:name="com.dubrow.paintrackerfree.ui.settings.SettingsFragment"
         android:label="Settings" />
 
     <fragment
         android:id="@+id/logEntryFragment"
-        android:name="com.example.paintrackerfree.ui.logentry.LogEntryFragment"
+        android:name="com.dubrow.paintrackerfree.ui.logentry.LogEntryFragment"
         android:label="Log Entry">
         <argument
             android:name="entryId"

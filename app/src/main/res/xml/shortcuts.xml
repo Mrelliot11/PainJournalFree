@@ -8,9 +8,9 @@
         android:shortcutShortLabel="@string/quick_log"
         android:shortcutLongLabel="@string/quick_log_title">
         <intent
-            android:action="com.example.paintrackerfree.QUICK_LOG"
-            android:targetPackage="com.example.paintrackerfree"
-            android:targetClass="com.example.paintrackerfree.MainActivity" />
+            android:action="com.dubrow.paintrackerfree.QUICK_LOG"
+            android:targetPackage="com.dubrow.paintrackerfree"
+            android:targetClass="com.dubrow.paintrackerfree.MainActivity" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
 

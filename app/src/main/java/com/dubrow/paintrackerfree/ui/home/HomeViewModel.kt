@@ -1,0 +1,49 @@
+package com.dubrow.paintrackerfree.ui.home
+
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
+import com.dubrow.paintrackerfree.data.model.PainEntry
+import com.dubrow.paintrackerfree.data.repository.PainRepository
+import com.dubrow.paintrackerfree.util.DateUtils
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+
+class HomeViewModel(private val repository: PainRepository) : ViewModel() {
+
+    /** Set to true to trigger the quick-log bottom sheet; reset to false after consuming. */
+    val openQuickLogSheet = MutableLiveData(false)
+
+    var lastDeleted: PainEntry? = null
+
+    fun deleteEntry(entry: PainEntry) {
+        lastDeleted = entry
+        viewModelScope.launch { repository.delete(entry) }
+    }
+
+    fun quickLog(painLevel: Int) {
+        viewModelScope.launch {
+            repository.insert(PainEntry(painLevel = painLevel))
+        }
+    }
+
+    fun restoreLastDeleted() {
+        lastDeleted?.let { entry ->
+            viewModelScope.launch { repository.insert(entry) }
+            lastDeleted = null
+        }
+    }
+
+    val recentEntries: LiveData<List<PainEntry>> = repository.getRecentEntries().asLiveData()
+
+    val todayEntries: LiveData<List<PainEntry>> = repository
+        .getEntriesInRange(DateUtils.startOfDay(), DateUtils.endOfDay())
+        .asLiveData()
+
+    val todayAvgPain: LiveData<Float?> = repository
+        .getEntriesInRange(DateUtils.startOfDay(), DateUtils.endOfDay())
+        .map { entries -> if (entries.isEmpty()) null else entries.map { it.painLevel }.average().toFloat() }
+        .asLiveData()
+}

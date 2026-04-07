@@ -27,7 +27,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <action android:name="com.example.paintrackerfree.QUICK_LOG" />
+                <action android:name="com.dubrow.paintrackerfree.QUICK_LOG" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <meta-data
