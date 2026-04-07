@@ -44,13 +44,13 @@ All data stays on your device. No accounts, no ads, no internet connection requi
 
 ## Screenshots
 
-<img src="Screenshots/home.png" width="200" alt="Home screen showing today's stats and recent entries">
-<img src="Screenshots/log_entry_top.png" width="200" alt="Log entry form — pain level and body location">
-<img src="Screenshots/log_entry_bottom.png" width="200" alt="Log entry form — triggers, notes, mood and save">
-<img src="Screenshots/history.png" width="200" alt="History screen with search and filters">
-<img src="Screenshots/reports.png" width="200" alt="Reports screen with pain trend chart and summary stats">
-<img src="Screenshots/settings_reminders.png" width="200" alt="Settings — reminders and customization">
-<img src="Screenshots/settings_backup.png" width="200" alt="Settings — auto-backup and import/export">
+<img src="Screenshots/home.png" width="180" alt="Home">&nbsp;&nbsp;
+<img src="Screenshots/log_entry_top.png" width="180" alt="Log entry (top)">&nbsp;&nbsp;
+<img src="Screenshots/log_entry_bottom.png" width="180" alt="Log entry (bottom)">&nbsp;&nbsp;
+<img src="Screenshots/history.png" width="180" alt="History">&nbsp;&nbsp;
+<img src="Screenshots/reports.png" width="180" alt="Reports">&nbsp;&nbsp;
+<img src="Screenshots/settings_reminders.png" width="180" alt="Settings — reminders">&nbsp;&nbsp;
+<img src="Screenshots/settings_backup.png" width="180" alt="Settings — backup">
 ---
 
 ## Tech Stack
